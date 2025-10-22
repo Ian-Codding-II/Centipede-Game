@@ -14,3 +14,6 @@
 // - Clamp to screen bounds
 // - Shoot bullets on spacebar
 // - Track lives
+#include <SFML/Graphics.hpp>  
+#include <iostream>
+ 
