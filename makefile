@@ -13,15 +13,15 @@ OBJECTS = $(SOURCES:$(SRCDIR)/%.cpp=$(OBJDIR)/%.o)
 TARGET = $(BINDIR)/centipede
 all: $(TARGET)
 $(TARGET): $(OBJECTS)
-@mkdir -p $(BINDIR)
-$(CXX) $(OBJECTS) -o $@ $(LDFLAGS)
+	@mkdir -p $(BINDIR)
+	$(CXX) $(OBJECTS) -o $@ $(LDFLAGS)
 $(OBJDIR)/%.o: $(SRCDIR)/%.cpp
-@mkdir -p $(OBJDIR)
-$(CXX) $(CXXFLAGS) -I$(INCDIR) -c $< -o $@
+	@mkdir -p $(OBJDIR)
+	$(CXX) $(CXXFLAGS) -I$(INCDIR) -c $< -o $@
 clean:
-rm -rf $(OBJDIR) $(BINDIR)
+	rm -rf $(OBJDIR) $(BINDIR)
 run: $(TARGET)
-./$(TARGET)
+	./$(TARGET)
 # This declares that `all`, `clean`, and `run` are phony targets (fake targets)
 # Make will always run these commands, even if files with those names exist
 .PHONY: all clean run
