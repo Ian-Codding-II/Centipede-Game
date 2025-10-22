@@ -34,8 +34,8 @@ public:
 
     ~Mushroom();
 
-    bool setPos(sf::Vector2f pos);
-    bool setPos(int x, int y);
+    void setPos(sf::Vector2f pos);
+    void setPos(int x, int y);
 
     sf::Vector2f getPos() const {return mPosition;}
     sf::Texture getTexture() const {return mTexture;}

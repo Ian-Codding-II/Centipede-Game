@@ -12,12 +12,12 @@ SOURCES = $(wildcard $(SRCDIR)/*.cpp)
 OBJECTS = $(SOURCES:$(SRCDIR)/%.cpp=$(OBJDIR)/%.o)
 TARGET = $(BINDIR)/centipede
 all: $(TARGET)
-	$(TARGET): $(OBJECTS)
-		@mkdir -p $(BINDIR)
-		$(CXX) $(OBJECTS) -o $@ $(LDFLAGS)
-	$(OBJDIR)/%.o: $(SRCDIR)/%.cpp
-		@mkdir -p $(OBJDIR)
-		$(CXX) $(CXXFLAGS) -I$(INCDIR) -c $< -o $@
+$(TARGET): $(OBJECTS)
+	@mkdir -p $(BINDIR)
+	$(CXX) $(OBJECTS) -o $@ $(LDFLAGS)
+$(OBJDIR)/%.o: $(SRCDIR)/%.cpp
+	@mkdir -p $(OBJDIR)
+	$(CXX) $(CXXFLAGS) -I$(INCDIR) -c $< -o $@
 clean:
 	rm -rf $(OBJDIR) $(BINDIR)
 run: $(TARGET)
