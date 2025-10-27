@@ -24,15 +24,20 @@ class Mushroom : public sf::Drawable{
     //Health
     //Draw
 public:
-    Mushroom();
-    Mushroom(sf::Vector2f pos);
-    Mushroom(float x, float y);
-    Mushroom(int hp);
+    // Default constructor
+    Mushroom() : Mushroom(sf::Vector2f(0, 0), MAXHEALTH) {}
+    // Constructor w/ float vect2
+    Mushroom(sf::Vector2f pos) : Mushroom(pos, MAXHEALTH) {}
+    // Constructor w/ coords
+    Mushroom(float x, float y) : Mushroom(sf::Vector2f(x,y), MAXHEALTH) {}
+    // Constructor w/ hp
+    Mushroom(int hp) : Mushroom(sf::Vector2f(0,0), hp) {}
+    // Constructor w/ coords & hp
+    Mushroom(float x, float y, int hp) : Mushroom(sf::Vector2f(x, y), hp) {}
     Mushroom(sf::Vector2f pos, int hp);
-    Mushroom(float x, float y, int hp);
 
-
-    ~Mushroom();
+    // Default destructor;
+    ~Mushroom() {};
 
     void setPos(sf::Vector2f pos);
     void setPos(int x, int y);
