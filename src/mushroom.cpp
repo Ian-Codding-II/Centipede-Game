@@ -44,7 +44,7 @@ Mushroom::Mushroom(sf::Vector2f pos, int hp) {
  */
 void Mushroom::setPos(sf::Vector2f pos) {
     mPosition = pos;
-    // Update options
+    // Update position
 }
 
 /**

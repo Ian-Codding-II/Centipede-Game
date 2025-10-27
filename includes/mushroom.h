@@ -24,6 +24,9 @@ class Mushroom : public sf::Drawable{
     //Health
     //Draw
 public:
+
+    Mushroom(sf::Vector2f pos, int hp);
+    
     // Default constructor
     Mushroom() : Mushroom(sf::Vector2f(0, 0), MAXHEALTH) {}
     // Constructor w/ float vect2
@@ -34,7 +37,6 @@ public:
     Mushroom(int hp) : Mushroom(sf::Vector2f(0,0), hp) {}
     // Constructor w/ coords & hp
     Mushroom(float x, float y, int hp) : Mushroom(sf::Vector2f(x, y), hp) {}
-    Mushroom(sf::Vector2f pos, int hp);
 
     // Default destructor;
     ~Mushroom() {};
@@ -46,8 +48,8 @@ public:
     sf::Texture getTexture() const {return mTexture;}
     sf::Sprite getSprite() const {return mBlock;}
 
-    void update(sf::Event& e, sf::RenderWindow& window);
-    virtual void draw(sf::RenderTarget& target,sf::RenderStates states) const;
+    void update(sf::Event& e, sf::RenderWindow& window) {}
+    virtual void draw(sf::RenderTarget& target,sf::RenderStates states) const {}
 
 private:
     sf::Sprite mBlock;

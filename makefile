@@ -1,5 +1,5 @@
 CXX = g++
-CXXFLAGS = -std=c++17 -Wall -Wextra
+CXXFLAGS = -std=c++17 -Wall -Wextra -g
 LDFLAGS = -lsfml-graphics -lsfml-window -lsfml-system -lsfml-audio
 SRCDIR = src
 INCDIR = includes
