@@ -9,6 +9,24 @@
  * 
  */
 
+#pragma once
+
+#include <SFML/Graphics.hpp>
+class Game {
+public:
+    Game();
+    ~Game() {};
+    void handleInput();
+    void update(float time);
+    void render();
+    bool isDone() const;
+
+    private:
+    sf::RenderWindow mWindow;
+    bool mIsDone;
+    sf::Texture mTextureTile;
+    sf::Vector2f mIncrement;
+};
 // - Initialize SFML window
 // - Manage game states (Menu, Playing, Paused, GameOver)
 // - Handle state transitions

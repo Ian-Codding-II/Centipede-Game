@@ -9,24 +9,24 @@
  * 
  */
 
- #include "../includes/player.h"
+//  #include "../includes/player.h"
 
-int main()
-{
+// int main()
+// {
 
-    sf::Texture playerTexture;
+//     sf::Texture playerTexture;
 
-    if(!playerTexture.loadFromFile("assets/temporaryPlayer.png", sf::IntRect({10, 10}, {32, 32}))) // Load temporary triangle PNG titled "tempPlayer.png"
-    {
-        std::cerr << "There was an issue loading the player texture..." << '\n';
-        return 0;
-    }
+//     if(!playerTexture.loadFromFile("assets/temporaryPlayer.png", sf::IntRect({10, 10}, {32, 32}))) // Load temporary triangle PNG titled "tempPlayer.png"
+//     {
+//         std::cerr << "There was an issue loading the player texture..." << '\n';
+//         return 0;
+//     }
 
-    std::cout << "Success loading player texture... " << '\n';
-
-
+//     std::cout << "Success loading player texture... " << '\n';
 
 
 
 
-}
+
+
+// }
