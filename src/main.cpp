@@ -13,16 +13,18 @@
 #include "../includes/player.h"
 
 int main() {
+
+    Player player;
     sf::RenderWindow window(sf::VideoMode(800, 600), "Centipede");
     window.setFramerateLimit(60);
     
 
-    sf::RectangleShape player; // Initialize a player object
-    sf::RectangleShape bullet; // Initialize a bullet object
+    sf::RectangleShape playerShape; // Initialize a player object
+    sf::RectangleShape bulletShape; // Initialize a bullet object
     sf::Texture playerTexture;  // Initialize a player texture
     sf::Texture bulletTexture;  // Initialize a bullet texture
     //sf::Vector2f bulletPath = player.getPosition();
-    startPlayer(player,playerTexture); // Pass the player rectangle object and the player texture
+    player.startPlayer(playerShape,playerTexture); // Pass the player rectangle object and the player texture
     while (window.isOpen()) {
         sf::Event event;
         while (window.pollEvent(event)) {
@@ -44,10 +46,10 @@ int main() {
 
 
 
-        movePlayer(player);
+        player.movePlayer(playerShape);
         //playerShoot(bulletPath,bullet,bulletTexture);
         window.clear(sf::Color::Black);
-        window.draw(player);
+        window.draw(playerShape);
         //window.draw(bullet);
 
         // Game rendering will go here

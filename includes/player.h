@@ -22,7 +22,10 @@
 class Player
 {
     public:
-        
+        void startPlayer(sf::RectangleShape& rectangle, sf::Texture& playerTexture);
+        void movePlayer(sf::RectangleShape &playerRectangle);
+        bool boundsChecking(int x, int y);
+        void playerShoot(const sf::Vector2f &bulletPath, sf::RectangleShape& bulletRectangle, sf::Texture& bulletTexture);
 
 
 
@@ -30,11 +33,7 @@ class Player
 
 };
  
-void startPlayer(sf::RectangleShape& rectangle, sf::Texture& playerTexture);
-void changeBullet(sf::RectangleShape& bulletObj, sf::Texture& bulletTexture);
-void movePlayer(sf::RectangleShape &playerRectangle);
-bool boundsChecking(int x, int y);
-void playerShoot(const sf::Vector2f &bulletPath, sf::RectangleShape& bulletRectangle, sf::Texture& bulletTexture);
+
 
 
 
