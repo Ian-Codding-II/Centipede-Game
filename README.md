@@ -20,3 +20,4 @@ make run
 - Person A - Core Systems & UI
 - Person B - Player & Collision
 - Person C - AI & Environment
+    

@@ -16,4 +16,28 @@
 // - Track lives
 #include <SFML/Graphics.hpp>  
 #include <iostream>
+#ifndef PLAYER_H
+#define PLAYER_H
+
+class Player
+{
+    public:
+        
+
+
+
+    private:
+
+};
  
+void startPlayer(sf::RectangleShape& rectangle, sf::Texture& playerTexture);
+void changeBullet(sf::RectangleShape& bulletObj, sf::Texture& bulletTexture);
+void movePlayer(sf::RectangleShape &playerRectangle);
+bool boundsChecking(int x, int y);
+void playerShoot(const sf::Vector2f &bulletPath, sf::RectangleShape& bulletRectangle, sf::Texture& bulletTexture);
+
+
+
+
+
+#endif
