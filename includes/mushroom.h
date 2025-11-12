@@ -15,7 +15,8 @@
 
 #include <SFML/Graphics.hpp>
 
-int MAXHEALTH = 4;
+//int MaxX = 100, MaxY = 100, MinX = 100, MinY = 100;
+extern const int MAXHEALTH;
 
 class Mushroom : public sf::Drawable{
     //Texture
@@ -26,7 +27,7 @@ class Mushroom : public sf::Drawable{
 public:
 
     Mushroom(sf::Vector2f pos, int hp);
-    
+
     // Default constructor
     Mushroom() : Mushroom(sf::Vector2f(0, 0), MAXHEALTH) {}
     // Constructor w/ float vect2
@@ -44,19 +45,27 @@ public:
     void setPos(sf::Vector2f pos);
     void setPos(int x, int y);
 
+    void hit(float dmg);
+    void hit(int dmg);
+
     sf::Vector2f getPos() const {return mPosition;}
-    sf::Texture getTexture() const {return mTexture;}
+    sf::Texture getTexture() const {return mAtlas;}
     sf::Sprite getSprite() const {return mBlock;}
 
-    void update(sf::Event& e, sf::RenderWindow& window) {}
-    virtual void draw(sf::RenderTarget& target,sf::RenderStates states) const {}
+    void update(sf::Event& e, sf::RenderWindow& window);
+    virtual void draw(sf::RenderTarget& target,sf::RenderStates states) const;
 
 private:
+    void updateTexture();
+    // void updateLvl();
+
     sf::Sprite mBlock;
-    sf::Texture mTexture; // Not setable, dependent on level and super status
+    sf::Texture mAtlas; // PROBABLY TEMPORARY
     sf::Vector2f mPosition;
     int mHealth; // When hp == 0, destroy
     bool mSuper; // If super, change texture
+    int lvl;
+    
 };
 
 #endif

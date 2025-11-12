@@ -10,9 +10,12 @@
  */
 #include <SFML/Graphics.hpp>
 #include <iostream>
+#include "mushroom.h"
+
+Mushroom newMushroom(200, 200);
 
 int main() {
-    sf::RenderWindow window(sf::VideoMode(800, 600), "Centipede");
+    sf::RenderWindow window(sf::VideoMode(640, 360), "Centipede");
     window.setFramerateLimit(60);
 
     while (window.isOpen()) {
@@ -24,6 +27,7 @@ int main() {
 
         window.clear(sf::Color::Black);
         // Game rendering will go here
+        window.draw(newMushroom);
         window.display();
     }
 
