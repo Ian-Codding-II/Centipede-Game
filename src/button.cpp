@@ -1,7 +1,7 @@
 /**
  * @file button.cpp
  * @author Ian Codding II
- * @brief 
+ * @brief This file implements all of the button functionallity
  * @version 0.1
  * @date 2025-10-22
  * 

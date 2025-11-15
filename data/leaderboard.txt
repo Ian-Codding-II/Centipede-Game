@@ -1,0 +1,12 @@
+lisa 20
+bob 10
+bob 9
+jhon 8
+jerry 7
+zzzz 0
+bob 3000
+jhon 300
+bob 200
+jane 90
+frank 40
+
