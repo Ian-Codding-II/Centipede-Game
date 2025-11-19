@@ -15,8 +15,16 @@
 // - Move upward at constant speed
 // - Check if off-screen (deactivate)
 // - Simple rectangular collision bounds
+class Bullet
+{
+    public:
+        void startBullet(sf::RectangleShape& bulletObj, sf::Texture& bulletTexture);
+        int getPlayerPosition();
+        sf::Vector2f bulletPath{0.f, -1.f};
+        std::vector<sf::RectangleShape> bullets;
 
-void changeBullet(sf::RectangleShape& bulletObj, sf::Texture& bulletTexture);
+    private:
+};
 
 
 

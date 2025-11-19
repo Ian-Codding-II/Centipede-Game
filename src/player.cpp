@@ -22,7 +22,7 @@ void Player::startPlayer(sf::RectangleShape& rectangle, sf::Texture& playerTextu
     rectangle.setPosition(400.f, 500.f);
 
     // Load player texture
-    if (!playerTexture.loadFromFile("/home/roman/CS151/PA/Final/assets/HqCreature.png"))
+    if (!playerTexture.loadFromFile("/home/roman/CS151/Final/assets/HqCreature.png"))
     {
         std::cerr << "There was an issue loading the player texture...\n";
     }
@@ -36,26 +36,10 @@ void Player::startPlayer(sf::RectangleShape& rectangle, sf::Texture& playerTextu
 
 
 }
-/*
-void changeBullet(sf::RectangleShape& bulletObj, sf::Texture& bulletTexture)
-{
-    bulletObj.setSize(sf::Vector2f(10.f, 10.f));
-    bulletObj.setOutlineColor(sf::Color::Black);
-    bulletObj.setPosition(10.f, 20.f);
-
-    if (!bulletTexture.loadFromFile("/home/roman/CS151/Final/assets/purpleLaser.png"))
-    {
-        std::cerr << "There was an issue loading the player texture...\n";
-    }
-    else
-    {
-        bulletObj.setTexture(&bulletTexture);
-    }
-    //bulletObj.setOutlineThickness(5.f);
-   // rectangle.setPosition(10.f, 20.f);
 
 
-}*/
+
+
 void Player::movePlayer(sf::RectangleShape &playerRectangle)
 {
     sf::Vector2f pos = playerRectangle.getPosition();
@@ -88,7 +72,7 @@ void Player::movePlayer(sf::RectangleShape &playerRectangle)
         
     
 
-
+    // This is temporary bounds checking. Intentionally rough
         if(pos.x <= 5 && pos.y > 405)
         {
             playerRectangle.setPosition(6,pos.y); // Seems to work
@@ -110,6 +94,11 @@ void Player::movePlayer(sf::RectangleShape &playerRectangle)
         {
             playerRectangle.setPosition(pos.x-1,pos.y-1);
         }
+        else if(pos.y >= 595)
+        {
+            playerRectangle.setPosition(pos.x,570);
+
+        }
     }
     
    
@@ -129,16 +118,20 @@ bool Player::boundsChecking(int x, int y)
 }
 
 
-void Player::playerShoot(const sf::Vector2f &bulletPath, sf::RectangleShape& bulletRectangle, sf::Texture& bulletTexture)
+void Player::playerShoot(sf::RectangleShape& playerRect,sf::RectangleShape& bulletShape ,sf::Texture& bulletTexture,Bullet &projectile)
 {
-    
+    sf::Vector2f pos;
     if(sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
     {
-        std::cout << "Shoot..." << '\n';
-        bulletRectangle.setPosition(400,300);
-        bulletRectangle.setTexture(&bulletTexture);
+        pos = playerRect.getPosition();
+        std::cout << "Current bullet position x: " << pos.x << " y: " << pos.y << '\n';
+        projectile.bullets.push_back(bulletShape);
+        //std::cout << projectile.bullets.size();
+        bulletShape.setPosition(pos.x,pos.y);
     }
-    
+
+
+
 
 }
 

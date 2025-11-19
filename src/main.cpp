@@ -11,10 +11,11 @@
 #include <SFML/Graphics.hpp>
 #include <iostream>
 #include "../includes/player.h"
-
+#include "../includes/bullet.h"
 int main() {
 
     Player player;
+    Bullet bullet;
     sf::RenderWindow window(sf::VideoMode(800, 600), "Centipede");
     window.setFramerateLimit(60);
     
@@ -25,12 +26,15 @@ int main() {
     sf::Texture bulletTexture;  // Initialize a bullet texture
     //sf::Vector2f bulletPath = player.getPosition();
     player.startPlayer(playerShape,playerTexture); // Pass the player rectangle object and the player texture
+    bullet.startBullet(bulletShape,bulletTexture);
     while (window.isOpen()) {
         sf::Event event;
         while (window.pollEvent(event)) {
             if (event.type == sf::Event::Closed)
                 window.close();
         }
+
+    
 
 
         // execute with g++ main.cpp player.cpp -o game -lsfml-graphics -lsfml-window -lsfml-system
@@ -47,10 +51,10 @@ int main() {
 
 
         player.movePlayer(playerShape);
-        //playerShoot(bulletPath,bullet,bulletTexture);
+        player.playerShoot(playerShape,bulletShape,bulletTexture,bullet);
         window.clear(sf::Color::Black);
         window.draw(playerShape);
-        //window.draw(bullet);
+        window.draw(bulletShape);
 
         // Game rendering will go here
         window.display();
