@@ -9,6 +9,7 @@
  * 
  */
 
+
 #include <SFML/Graphics.hpp>
 #include <iostream>
 #include "../includes/player.h"
@@ -32,7 +33,6 @@ void Player::startPlayer(sf::RectangleShape& rectangle, sf::Texture& playerTextu
     rectangle.setTexture(&playerTexture);
 
     
-
 
 
 }
@@ -131,12 +131,6 @@ void Player::playerShoot(sf::RectangleShape& playerRect,sf::RectangleShape& bull
     }
 
 
-
-
 }
-
-
-
-
 
 

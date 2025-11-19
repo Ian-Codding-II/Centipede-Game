@@ -1,32 +1,26 @@
 /**
  * @file main.cpp
  * @author Ian Codding II
- * @brief 
- * @version 0.1
- * @date 2025-10-21
+ * @brief Entry point for Centipede game - sets up window and main loop
+ * @version 2.0
+ * @date 2025-10-27
  * 
  * @copyright Copyright (c) 2025
- * 
  */
+
+#include "../includes/errorHandler.h"
+#include "../includes/game.h"
+#include "../includes/Game_State.h"
+#include "../includes/ScreenManager.h"
+#include <SFML/System/Clock.hpp>
+#include <iostream>
 #include <SFML/Graphics.hpp>
 #include <iostream>
-#include "../includes/player.h"
-#include "../includes/bullet.h"
-int main() {
 
-    Player player;
-    Bullet bullet;
+int main() {
     sf::RenderWindow window(sf::VideoMode(800, 600), "Centipede");
     window.setFramerateLimit(60);
-    
 
-    sf::RectangleShape playerShape; // Initialize a player object
-    sf::RectangleShape bulletShape; // Initialize a bullet object
-    sf::Texture playerTexture;  // Initialize a player texture
-    sf::Texture bulletTexture;  // Initialize a bullet texture
-    //sf::Vector2f bulletPath = player.getPosition();
-    player.startPlayer(playerShape,playerTexture); // Pass the player rectangle object and the player texture
-    bullet.startBullet(bulletShape,bulletTexture);
     while (window.isOpen()) {
         sf::Event event;
         while (window.pollEvent(event)) {
@@ -34,28 +28,7 @@ int main() {
                 window.close();
         }
 
-    
-
-
-        // execute with g++ main.cpp player.cpp -o game -lsfml-graphics -lsfml-window -lsfml-system
-        // execute with g++ main.cpp player.cpp -o game -lsfml-graphics -lsfml-window -lsfml-system
-        // execute with g++ main.cpp player.cpp -o game -lsfml-graphics -lsfml-window -lsfml-system
-        // execute with g++ main.cpp player.cpp -o game -lsfml-graphics -lsfml-window -lsfml-system
-        // execute with g++ main.cpp player.cpp -o game -lsfml-graphics -lsfml-window -lsfml-system
-        // execute with g++ main.cpp player.cpp -o game -lsfml-graphics -lsfml-window -lsfml-system
-        // execute with g++ main.cpp player.cpp -o game -lsfml-graphics -lsfml-window -lsfml-system
-        // execute with g++ main.cpp player.cpp -o game -lsfml-graphics -lsfml-window -lsfml-system
-        // execute with g++ main.cpp player.cpp -o game -lsfml-graphics -lsfml-window -lsfml-system
-        // execute with g++ main.cpp player.cpp -o game -lsfml-graphics -lsfml-window -lsfml-system
-
-
-
-        player.movePlayer(playerShape);
-        player.playerShoot(playerShape,bulletShape,bulletTexture,bullet);
         window.clear(sf::Color::Black);
-        window.draw(playerShape);
-        window.draw(bulletShape);
-
         // Game rendering will go here
         window.display();
     }
