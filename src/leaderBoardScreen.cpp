@@ -118,10 +118,10 @@ GameState LeaderboardScreen::update(sf::Event &event) {
             return GameState::MENU;
         }
     }
-    if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Escape) {
-        std::cout << "[LeaderboardScreen] Escaped clicked - returning to menu" << std::endl;
-        return GameState::MENU;
-    }
+    // if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Escape) {
+    //     std::cout << "[LeaderboardScreen] Escaped clicked - returning to menu" << std::endl;
+    //     return GameState::MENU;
+    // }
 
     // Stay on leaderboard
     return GameState::LEADERBOARD;
