@@ -12,9 +12,12 @@
 #pragma once
 
 #include <SFML/Graphics.hpp>
+#include "ScreenManager.h"
+
 class Game {
   public:
     Game();
+    Game(sf::RenderWindow& win, ScreenManager& sm);
     ~Game() {};
     void handleInput();
     void update(float time);

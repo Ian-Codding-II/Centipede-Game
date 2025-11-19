@@ -9,6 +9,7 @@
  * 
  */
 #include "../includes/game.h"
+#include "../includes/ScreenManager.h"
 
 /**
  * @brief Construct a new Game:: Game object
@@ -26,6 +27,20 @@ Game::Game()
     mIncrement = sf::Vector2f(4.f, 4.f);
     mIsDone = false;
 }
+
+
+Game::Game(sf::RenderWindow& win, ScreenManager& sm)
+{
+
+    
+
+
+
+
+}
+
+
+
 
 /**
  * @brief
