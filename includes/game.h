@@ -1,27 +1,27 @@
 /**
  * @file game.h
  * @author Ian Codding II
- * @brief 
+ * @brief Decleration of Game class - main gameplay logic
  * @version 0.1
  * @date 2025-10-21
- * 
+ *
  * @copyright Copyright (c) 2025
- * 
+ *
  */
 
 #pragma once
 
+#include "bullet.h"
+#include "Centipede_Segment.h"
+#include "Collision_Manager.h"
+#include "Game_State.h"
+#include "player.h"
+#include "ScreenManager.h"
+#include "SettingsScreen.h"
 #include <SFML/Graphics.hpp>
 #include <SFML/Graphics/RectangleShape.hpp>
 #include <SFML/Graphics/Text.hpp>
 #include <vector>
-#include "Game_State.h"
-#include "ScreenManager.h"
-#include "SettingsScreen.h"
-#include "Collision_Manager.h"
-#include "Centipede_Segment.h"
-#include "player.h"
-#include "bullet.h"
 
 // Forward declarations - these classes exist but we onl need pointers to them
 // This avoids circular includes
@@ -33,45 +33,44 @@ class Mushroom;
 /**
  * @class Game
  * @brief Main game class that handels all gameplay logic
- * 
+ *
  */
 class Game {
 
   private:
-  sf::RenderWindow & window;
-  ScreenManager& screenManager;
+    sf::RenderWindow &window;
+    ScreenManager &screenManager;
 
-  GameState currentState;
-  bool isGameOver;
-  bool isPaused;
+    GameState currentState;
+    bool isGameOver;
+    bool isPaused;
 
-  int score;
-  int lives;
-  int level;
+    int score;
+    int lives;
+    int level;
 
-  Player * player;
-  Centipede * centipede;
-  // If we ever make the spider class,
-  // then we would have a pointer to spider
+    Player *player;
+    Centipede *centipede;
+    // If we ever make the spider class,
+    // then we would have a pointer to spider
 
-  std::vector<Bullet*> bullets;
-  std::vector<Mushroom*> mushrooms;
+    std::vector<Bullet *> bullets;
+    std::vector<Mushroom *> mushrooms;
 
-  sf::Text scoreText; // Displays current score
-  sf::Text livesText; // Displays remaining lives
-  sf::Text levelText; // Displays current level
+    sf::Text scoreText; // Displays current score
+    sf::Text livesText; // Displays remaining lives
+    sf::Text levelText; // Displays current level
 
-  sf::RectangleShape background; // Black background rectangle
+    sf::RectangleShape background; // Black background rectangle
 
   public:
-    Game();
-    Game(sf::RenderWindow& win, ScreenManager& screenMngr);
-    
+    Game(sf::RenderWindow &win, ScreenManager &screenMngr);
+
     ~Game();
 
     void initualize();
 
-    void handleInput(const sf::Event& event);
+    void handleInput(const sf::Event &event);
 
     void update(float dt);
 
