@@ -19,18 +19,13 @@ class Game {
     Game();
     Game(sf::RenderWindow& win, ScreenManager& sm);
     ~Game() {};
-    void handleInput();
+    void handleInput(sf::RectangleShape& playrect, Player obj);
     void update(float time);
     void render();
     bool isDone() const;
-
+    void initializeGame();
   private:
-    sf::RenderWindow mWindow;
-    bool mIsDone;
-    sf::Texture mTextureTile;
-    sf::CircleShape mCherryPlant;
-    sf::Vector2f mIncrement;
-    void moveCherry(float time);
+    
 };
 // - Initialize SFML window
 // - Manage game states (Menu, Playing, Paused, GameOver)

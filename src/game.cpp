@@ -10,101 +10,66 @@
  */
 #include "../includes/game.h"
 #include "../includes/ScreenManager.h"
+#include "../includes/player.h"
 
 /**
  * @brief Construct a new Game:: Game object
  *
  */
-Game::Game()
-    : mWindow(sf::VideoMode(640, 480), "Bouncing sprite.") {
-    mWindow.setFramerateLimit(60);
-    mWindow.setPosition({50, 50});
-    mTextureTile.loadFromFile("assets/rpg_textures.png");
-    mCherryPlant.setRadius(31);
-    mCherryPlant.setTexture(&mTextureTile);
-    mCherryPlant.setTextureRect(sf::IntRect(64, 32, 62, 62));
-    mCherryPlant.setOrigin(62.f / 2.f, 62.f / 2.f);
-    mIncrement = sf::Vector2f(4.f, 4.f);
-    mIsDone = false;
-}
 
+    Game::Game()
+    {
 
-Game::Game(sf::RenderWindow& win, ScreenManager& sm)
-{
+    }
+    Game::Game(sf::RenderWindow& win, ScreenManager& sm)
+    {
 
-    
+    }
+    Game::~Game()
+    {
 
+    }
+    void Game::handleInput(sf::RectangleShape& playrect, Player obj)
+    {
+        bool playerMoving = true;
+        while(playerMoving)
+        {
+            obj.movePlayer(playrect);
 
-
-
-}
-
-
-
-
-/**
- * @brief
- *
- */
-void Game::handleInput() {
-    sf::Event event;
-    while (mWindow.pollEvent(event)) {
-        if (event.type == sf::Event::Closed) {
-            // Close window button clicked.
-            mWindow.close();
         }
     }
-}
-
-/**
- * @brief
- *
- */
-void Game::update(float time) {
-    moveCherry(time);
-}
-
-/**
- * @brief
- *
- */
-void Game::moveCherry(float time) {
-    sf::Vector2u winSize = mWindow.getSize();
-    int cherryX = 62;
-    int cherryY = 62;
-    float speed = 60; // controls speed
-
-    if ((mCherryPlant.getPosition().x + (cherryX / 2) > winSize.x && mIncrement.x > 0) ||
-        (mCherryPlant.getPosition().x - (cherryX / 2) < 0 && mIncrement.x < 0)) {
-        // Reverse the direction on X axis
-        mIncrement.x = -mIncrement.x;
+    void Game::update(float time)
+    {
+        
     }
-    if ((mCherryPlant.getPosition().y + (cherryY / 2) > winSize.y && mIncrement.y > 0) ||
-        (mCherryPlant.getPosition().y - (cherryY / 2) < 0 && mIncrement.y < 0)) {
-        // Reverse the direction on Y axis.
-        mIncrement.y = -mIncrement.y;
+    void Game::render()
+    {
+       
+        
     }
-    mCherryPlant.setPosition(
-        mCherryPlant.getPosition().x + mIncrement.x*speed*time,
-        mCherryPlant.getPosition().y + mIncrement.y*speed*time);
-}
+    bool Game::isDone() const
+    {
 
-/**
- * @brief 
- * 
- */
-void Game::render() {
-    mWindow.clear(sf::Color::Black);
-    mWindow.draw(mCherryPlant);
-    mWindow.display();
-}
+    }
+    void Game::initializeGame()
+    {
+        Player player; // Initialize the player object
+        sf::RectangleShape playerShape; // Initialize player shape
+        sf::Texture playerTexture; // Initialize player texture
+        playerTexture.loadFromFile("../assets/HqCreature.png"); // Load player image
+        player.startPlayer(playerShape,playerTexture); // This essentially loads both the player shape and texture together
+        
+        
+    }
+    /*
+        void startPlayer(sf::RectangleShape& rectangle, sf::Texture& playerTexture);
+        void movePlayer(sf::RectangleShape &playerRectangle);
+        bool boundsChecking(int x, int y);
+        void playerShoot(sf::RectangleShape& playerRect,sf::RectangleShape& bulletShape ,sf::Texture& bulletTexture,Bullet &projectile);
+        std::vector<sf::RectangleShape> bullets; 
+    */
 
-/**
- * @brief
- *
- * @return true
- * @return false
- */
-bool Game::isDone() const {
-    return (!mWindow.isOpen() || mIsDone);
-}
+ 
+
+
+

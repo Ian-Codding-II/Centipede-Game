@@ -12,6 +12,7 @@
 #include "../includes/game.h"
 #include "../includes/Game_State.h"
 #include "../includes/ScreenManager.h"
+#include "../includes/player.h"
 #include <SFML/System/Clock.hpp>
 #include <iostream>
 #include <SFML/Graphics.hpp>
@@ -285,13 +286,25 @@ int main() {
                           * - Press ESC to pause
                           * - Game class (not ScreenManager) handles all events
                           */
+
+
+
                         if (!game) {
                             game = new Game(window, screenManager);
                         }
-                        
-                        if(game){ // TEMP
+                        /*
+                        Initialize Player Object                        
+                        */
+                       
 
-                            game->handleInput();
+
+                        if(game){ 
+
+                            //Load player shape and texture.
+                            
+                            
+                            game->initializeGame();
+                            //game->handleInput();
                             //game.update(dt);
                             game->render();
                          }
@@ -331,7 +344,7 @@ int main() {
                   * IMPORTANT: Pass dt to ensure frame-independent movement!
                   * Without dt, movement would be frame-dependent and vary with FPS.
                   */
-                    game->update(dt);
+                    //game->update(dt);
 
                  // Check if Game class changed state (e.g., PLAYING -> PAUSED or GAME_OVER)
                 //  GameState newState = game.getState();
