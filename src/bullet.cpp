@@ -22,10 +22,11 @@ void Bullet::startBullet(sf::RectangleShape& bulletObj, sf::Texture& bulletTextu
     }
     else
     {
+        std::cout << "Bullet texture loaded successfully." << '\n';
         bulletObj.setTexture(&bulletTexture);
     }
-   bulletObj.setOutlineThickness(5.f);
-   bulletObj.setPosition(10.f, 20.f);
+    bulletObj.setOutlineThickness(5.f);
+    bulletObj.setPosition(10.f, 20.f);
 
 
 }

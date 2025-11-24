@@ -13,6 +13,10 @@
 #include <SFML/Graphics.hpp>
 #include <iostream>
 #include "../includes/player.h"
+#include <fstream>
+#include <chrono>
+#include <thread>
+
 
 void Player::startPlayer(sf::RectangleShape& rectangle, sf::Texture& playerTexture)
 {
@@ -23,11 +27,16 @@ void Player::startPlayer(sf::RectangleShape& rectangle, sf::Texture& playerTextu
     rectangle.setPosition(400.f, 500.f);
 
     // Load player texture
-    if (!playerTexture.loadFromFile("/home/roman/CS151/Final/assets/HqCreature.png"))
+
+    if (!playerTexture.loadFromFile("/home/roman/CS151/Final/assets/HqCreature.png")) // Absolute path seems to work
     {
         std::cerr << "There was an issue loading the player texture...\n";
     }
-    std::cout << "Success loading player texture...\n";
+    else
+    {
+        std::cout << "Success loading player texture...\n";
+
+    }
 
     // Apply texture to rectangle
     rectangle.setTexture(&playerTexture);
@@ -126,9 +135,14 @@ void Player::playerShoot(sf::RectangleShape& playerRect,sf::RectangleShape& bull
         pos = playerRect.getPosition();
         std::cout << "Current bullet position x: " << pos.x << " y: " << pos.y << '\n';
         projectile.bullets.push_back(bulletShape);
+        
         //std::cout << projectile.bullets.size();
-        bulletShape.setPosition(pos.x,pos.y);
+        bulletShape.setPosition(pos.x+9,pos.y);
+        
     }
+
+   
+    
 
 
 }

@@ -11,53 +11,52 @@
 #include "../includes/game.h"
 #include "../includes/ScreenManager.h"
 #include "../includes/player.h"
-
+#include <fstream>
 /**
  * @brief Construct a new Game:: Game object
  *
  */
 
-    Game::Game()
+ 
+    
+    Game::Game(sf::RenderWindow& win, ScreenManager& sm) : window(win) 
     {
-
+        initializeGame();
     }
-    Game::Game(sf::RenderWindow& win, ScreenManager& sm)
-    {
-
-    }
-    Game::~Game()
-    {
-
-    }
-    void Game::handleInput(sf::RectangleShape& playrect, Player obj)
-    {
-        bool playerMoving = true;
-        while(playerMoving)
-        {
-            obj.movePlayer(playrect);
-
-        }
-    }
-    void Game::update(float time)
+    void Game::handleInput(sf::RectangleShape& playrect, Player* obj)
     {
         
+        obj->movePlayer(playrect);
+        obj->playerShoot(playrect,bulletShape,bulletTexture,bullet);
+
+    }
+    void Game::update(float time)
+    { 
+        sf::Vector2f position = bulletShape.getPosition();
+        float speed = 300.f;           
+        position.y -= speed * time;      
+        bulletShape.setPosition(position);
+        if(position.y <= 5)
+        {
+            // Delete the bullet object.
+        }
+
     }
     void Game::render()
     {
-       
-        
+       window.draw(playerShape);
+       window.draw(bulletShape);
     }
     bool Game::isDone() const
     {
-
+        return true;
     }
     void Game::initializeGame()
     {
-        Player player; // Initialize the player object
-        sf::RectangleShape playerShape; // Initialize player shape
-        sf::Texture playerTexture; // Initialize player texture
-        playerTexture.loadFromFile("../assets/HqCreature.png"); // Load player image
+
+
         player.startPlayer(playerShape,playerTexture); // This essentially loads both the player shape and texture together
+        bullet.startBullet(bulletShape,bulletTexture);
         
         
     }
@@ -67,7 +66,8 @@
         bool boundsChecking(int x, int y);
         void playerShoot(sf::RectangleShape& playerRect,sf::RectangleShape& bulletShape ,sf::Texture& bulletTexture,Bullet &projectile);
         std::vector<sf::RectangleShape> bullets; 
-    */
+        */
+    
 
  
 

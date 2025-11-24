@@ -286,11 +286,13 @@ int main() {
                           * - Press ESC to pause
                           * - Game class (not ScreenManager) handles all events
                           */
+                         
 
 
 
                         if (!game) {
                             game = new Game(window, screenManager);
+                            //game->initializeGame();
                         }
                         /*
                         Initialize Player Object                        
@@ -301,12 +303,13 @@ int main() {
                         if(game){ 
 
                             //Load player shape and texture.
-                            
-                            
-                            game->initializeGame();
-                            //game->handleInput();
-                            //game.update(dt);
-                            game->render();
+                            // sf::RectangleShape playerSh;
+                            // Player* now;
+                            //Expecting a rectangle shape and a pointer to a Player object
+                            //game->handleInput(playerSh,now);
+                            //game->update(dt);
+
+                            //game->render();
                          }
                         //  game.handleInput(event);
                          break;
@@ -344,7 +347,10 @@ int main() {
                   * IMPORTANT: Pass dt to ensure frame-independent movement!
                   * Without dt, movement would be frame-dependent and vary with FPS.
                   */
-                    //game->update(dt);
+                  //game->update(dt)
+                    //game->handleInput(game->playerShape,&game->player);
+
+                   
 
                  // Check if Game class changed state (e.g., PLAYING -> PAUSED or GAME_OVER)
                 //  GameState newState = game.getState();
@@ -380,8 +386,14 @@ int main() {
                   * Render gameplay
                   * Draws: background, mushrooms, centipede, bullets, player, HUD
                   */
-                //  game.render();
-             } else {
+                  if(game)
+                  {
+                    game->handleInput(game->playerShape,&game->player);
+                    game->update(dt);
+                    game->render();
+                  }
+             }
+              else {
                  /**
                   * Render UI screen
                   * Draws: buttons, menus, leaderboard, pause screen, etc.
