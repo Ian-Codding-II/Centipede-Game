@@ -18,60 +18,21 @@ const int MAXHEALTH = 4;
  * @param pos   Vector2f position
  * @param hp    0 < hp <= 4 Number of hitpoints/health
  */
-Mushroom::Mushroom(sf::Vector2f pos, int hp) {
-    //** REMOVE LATER **//
-    if (!mAtlas.loadFromFile("assets/temp/Normal_mushroom1.png")) {
-        cerr << "Cannot load mushroom texture(s)\n";
-        exit(1);
-    }
+Mushroom::Mushroom(sf::Texture& texture, sf::IntRect spriteTexture, sf::Vector2i pos, int hp, bool isSuper) : c_obj(texture, spriteTexture, pos) {
 
-    mBlock.setTexture(mAtlas);
-    sf::Vector2u imageSize = mAtlas.getSize();
-    mBlock.setOrigin(imageSize.x/2, imageSize.y/2);
-    updateTexture();
+    if (isSuper) {
+        mShroomState = super;
+    } else {
+        mShroomState = normal;
+    }
     
     if (hp <= 0)
         mHealth = 1;
     else if (hp > MAXHEALTH)
         mHealth = MAXHEALTH;
-
-    mPosition = pos;
-    setPos(mPosition);
     
-}
-
-/**
- * @brief Sets mushroom position w/ float Vector2
- * 
- * @param pos Vector2 position
- */
-void Mushroom::setPos(sf::Vector2f pos) {
-    mPosition = pos;
-    // Update position
-    mBlock.setPosition(mPosition);
-}
-
-/**
- * @brief Sets mushroom positions w/ coords
- * 
- * @param x X coordinate
- * @param y Y coordinate
- */
-void Mushroom::setPos(int x, int y) {
-    // if (x > MaxX) {
-    //     x = MaxX;
-    // } else if (x < MinX) {
-    //     x = MinX;
-    // }
-
-    // if (y > MaxY) {
-    //     y = MaxY;
-    // } else if (y < MinY) {
-    //     y = MinY;
-    // }
+    updateTexture();
     
-    sf::Vector2f pos(x, y);
-    setPos(pos);
 }
 
 /**
@@ -97,6 +58,8 @@ void Mushroom::hit(int dmg) {
     } else {
         mHealth -= dmg;
     }
+
+    updateTexture();
 }
 
 /**
@@ -104,18 +67,44 @@ void Mushroom::hit(int dmg) {
  * 
  */
 void Mushroom::updateTexture() {
-    if (mHealth == 0) {
-        // Destroy
-    } else if (mHealth > MAXHEALTH * 0.75) { // If > 75%
-        // Full Mushroom
-        sf::IntRect Tex(1, 1, 1, 1);
-        mBlock.setTextureRect(Tex);
-    } else if (mHealth > MAXHEALTH * 0.5 and mHealth < MAXHEALTH * 0.75) { // If  > 50% and < 75%
-        // Hit Mushroom
-    } else if (mHealth > MAXHEALTH * 0.25 and mHealth < MAXHEALTH * 0.5) { // If > 25% and < 50%
-        // Damaged Mushroom
-    } else if (mHealth > 0 and mHealth < MAXHEALTH * 0.25) { // If > 0 and < 25%
-        // Broken Mushroom
+    // if (mHealth == 0 or mShroomState == destroy) {
+    //     // Destroy
+    // }
+
+    switch (mShroomState) {
+        case normal:
+            if (mHealth > (MAXHEALTH * 0.75)) { // If > 75%
+                // Full Mushroom
+                setSpriteRect(sf::IntRect(8*8, 8*2, 8, 8));
+            } else if (mHealth > (MAXHEALTH * 0.5) and mHealth < (MAXHEALTH * 0.75)) { // If  > 50% and < 75%
+                // Hit Mushroom
+                setSpriteRect(sf::IntRect(8*9, 8*2, 8, 8));
+            } else if (mHealth > (MAXHEALTH * 0.25) and mHealth < (MAXHEALTH * 0.5)) { // If > 25% and < 50%
+                // Damaged Mushroom
+                setSpriteRect(sf::IntRect(8*10, 8*2, 8, 8));
+            } else if (mHealth > 0 and mHealth < (MAXHEALTH * 0.25)) { // If > 0 and < 25%
+                // Broken Mushroom
+                setSpriteRect(sf::IntRect(8*11, 8*2, 8, 8));
+            }
+
+            break;
+
+        case super:
+            if (mHealth > (MAXHEALTH * 0.75)) { // If > 75%
+                // Full Mushroom
+                setSpriteRect(sf::IntRect(8*8, 8*3, 8, 8));
+            } else if (mHealth > (MAXHEALTH * 0.5) and mHealth < (MAXHEALTH * 0.75)) { // If > 50% and < 75%
+                // Hit Mushroom
+                setSpriteRect(sf::IntRect(8*9, 8*3, 8, 8));
+            } else if (mHealth > (MAXHEALTH * 0.25) and mHealth < (MAXHEALTH * 0.5)) { // If > 25% and < 50%
+                // Damaged Mushroom
+                setSpriteRect(sf::IntRect(8*10, 8*3, 8, 8));
+            } else if (mHealth > 0 and mHealth < (MAXHEALTH * 0.25)) { // If > 0 and < 25%
+                // Broken Mushroom
+                setSpriteRect(sf::IntRect(8*11, 8*3, 8, 8));
+            }
+
+            break;
     }
 }
 
@@ -126,8 +115,8 @@ void Mushroom::updateTexture() {
  * @param e 
  * @param window 
  */
-void Mushroom::update(sf::Event& e, sf::RenderWindow& window) {
-
+void Mushroom::update() {
+    updateTexture();
 }
 
 /**
@@ -137,6 +126,6 @@ void Mushroom::update(sf::Event& e, sf::RenderWindow& window) {
  * @param states 
  */
 void Mushroom::draw(sf::RenderTarget& target,sf::RenderStates states) const {
-    target.draw(mBlock, states);
+    target.draw(mSprite, states);
 }
 

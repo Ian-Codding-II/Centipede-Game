@@ -1,16 +1,11 @@
 /**
- * @file Centipede_Segment.h
- * @author Ian Codding II
- * @brief 
- * @version 0.1
- * @date 2025-10-21
- * 
- * @copyright Copyright (c) 2025
- * 
+ * @file    Centipede_Segment.h
+ * @author  Ian Codding II, Balin Becker
+ * @brief   Create a centipede simulator
+ * @date    2025-10-21
  */
 
-// - Move horizontally (left or right)
-// - Reverse direction at edges
-// - Move down one row when reversing
-// - Follow previous segment if not head
-// - Handle death and spawning new centipede
+// Each segment is its own sprite
+// Each segment of the array follows after one another
+// Create an (array?) of segments
+
