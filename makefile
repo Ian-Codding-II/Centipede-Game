@@ -22,6 +22,23 @@ clean:
 	rm -rf $(OBJDIR) $(BINDIR)
 run: $(TARGET)
 	./$(TARGET)
-# This declares that `all`, `clean`, and `run` are phony targets (fake targets)
+
+# Debug build: Adds AddressSanitizer for runtime checks (e.g., use-after-free in screens).
+# Rationale: Run with 'make debug' to catch issues like null Button* in update(); LDFLAGS += -fsanitize=address.
+debug: CXXFLAGS += -fsanitize=address -fno-omit-frame-pointer
+debug: LDFLAGS += -fsanitize=address
+debug: clean all
+
+run-debug: debug
+	LSAN_OPTIONS=verbosity=1 ./$(TARGET)  # LeakSanitizer verbose.
+
+# Valgrind target: Runs Memcheck for memory errors (leaks, invalid reads) on built binary.
+# Rationale: --full leak-check tracks origins (e.g., Button new without delete in onExit); supp file quiets SFML.
+# Assumptions: valgrind.supp in root; --error-exitcode=1 halts on errors; logs to valgrind.log.
+valgrind: $(TARGET)
+	valgrind --leak-check=full --track-origins=yes \
+	         --log-file=valgrind.log --error-exitcode=1 ./$(TARGET)
+
+# This declares that `all`, `clean`, and `run` ... are phony targets (fake targets)
 # Make will always run these commands, even if files with those names exist
-.PHONY: all clean run
+.PHONY: all clean run debug run-debug valgrind
