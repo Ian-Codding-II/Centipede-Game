@@ -34,4 +34,4 @@ class c_obj : public sf::Drawable {
         static std::vector<c_obj*> objects;
 };
 
-#endif
+#endif 
