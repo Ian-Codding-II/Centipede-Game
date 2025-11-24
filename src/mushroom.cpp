@@ -76,10 +76,10 @@ void Mushroom::updateTexture() {
             if (mHealth > (MAXHEALTH * 0.75)) { // If > 75%
                 // Full Mushroom
                 setSpriteRect(sf::IntRect(8*8, 8*2, 8, 8));
-            } else if (mHealth > (MAXHEALTH * 0.5) and mHealth < (MAXHEALTH * 0.75)) { // If  > 50% and < 75%
+            } else if (mHealth > (MAXHEALTH * 0.5) and mHealth <= (MAXHEALTH * 0.75)) { // If  > 50% and < 75%
                 // Hit Mushroom
                 setSpriteRect(sf::IntRect(8*9, 8*2, 8, 8));
-            } else if (mHealth > (MAXHEALTH * 0.25) and mHealth < (MAXHEALTH * 0.5)) { // If > 25% and < 50%
+            } else if (mHealth > (MAXHEALTH * 0.25) and mHealth <= (MAXHEALTH * 0.5)) { // If > 25% and < 50%
                 // Damaged Mushroom
                 setSpriteRect(sf::IntRect(8*10, 8*2, 8, 8));
             } else if (mHealth > 0 and mHealth <= (MAXHEALTH * 0.25)) { // If > 0 and < 25%
