@@ -62,14 +62,7 @@
         
         
     }
-    /*
-        void startPlayer(sf::RectangleShape& rectangle, sf::Texture& playerTexture);
-        void movePlayer(sf::RectangleShape &playerRectangle);
-        bool boundsChecking(int x, int y);
-        void playerShoot(sf::RectangleShape& playerRect,sf::RectangleShape& bulletShape ,sf::Texture& bulletTexture,Bullet &projectile);
-        std::vector<sf::RectangleShape> bullets; 
-        */
-    
+   
 
  
 
@@ -123,19 +116,19 @@ Game::Game(sf::RenderWindow &win, ScreenManager &screenMngr)
 Game::~Game() {
 }
 
-void Game::initualize() {
-}
-
+/*
 void Game::handleInput(const sf::Event &event) {
-}
+} */ // Use this function for the final handle input function
 
-void Game::update(float dt) {
-}
 
 void Game::render() {
     // ===== DRAW BACKGROUND =====
     // Black rectangle covering entire screen
+    
+   
     window.draw(background);
+    window.draw(playerShape);
+    window.draw(bulletShape);
     // This will be at the top.
 
     // There will be more to draw, but this will be at the bottom
@@ -165,6 +158,32 @@ GameState Game::getState() const {
     return currentState;
 }
 
+
+
+ 
+    
+    Game::Game(sf::RenderWindow& win, ScreenManager& sm) : window(win) 
+    {
+        initializeGame();
+    }
+    void Game::handleInput(sf::RectangleShape& playrect, Player* obj)
+    {
+        
+        obj->movePlayer(playrect);
+        obj->playerShoot(playrect,bulletShape,bulletTexture,bullet);
+
+    }
+    
+    
+   
+   /*
+        void startPlayer(sf::RectangleShape& rectangle, sf::Texture& playerTexture);
+        void movePlayer(sf::RectangleShape &playerRectangle);
+        bool boundsChecking(int x, int y);
+        void playerShoot(sf::RectangleShape& playerRect,sf::RectangleShape& bulletShape ,sf::Texture& bulletTexture,Bullet &projectile);
+        std::vector<sf::RectangleShape> bullets; 
+        */
+    
 void Game::cleanup() {
 }
 
