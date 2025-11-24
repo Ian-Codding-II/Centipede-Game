@@ -30,18 +30,18 @@ c_obj::c_obj(sf::Texture& texture, sf::IntRect spriteTexture, sf::Vector2i pos) 
  * 
  * @return sf::Sprite* Array of sprites inside bounds
  */
-// std::vector<c_obj*> c_obj::getCollided() {
-//     std::vector<c_obj*> collisions;
-//     sf::FloatRect targetRegion = mSprite.getGlobalBounds();
-//     for (c_obj* obj: objects) {
-//         sf::FloatRect compareRegion = obj->mSprite.getGlobalBounds();
-//         if (targetRegion.intersects(compareRegion)) {
-//             collisions.push_back(obj);
-//         }
-//     }
+std::vector<c_obj*> c_obj::getCollided() {
+    std::vector<c_obj*> collisions;
+    sf::FloatRect targetRegion = mSprite.getGlobalBounds();
+    for (c_obj* obj: objects) {
+        sf::FloatRect compareRegion = obj->mSprite.getGlobalBounds();
+        if (targetRegion.intersects(compareRegion)) {
+            collisions.push_back(obj);
+        }
+    }
 
-//     return collisions;
-// }
+    return collisions;
+}
 
 /**
  * @brief Sets sprite position
