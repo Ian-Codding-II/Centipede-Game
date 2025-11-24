@@ -202,6 +202,17 @@ void ScreenManager::setState(GameState newState) {
     std::cout << "[ScreenManager] setState() called: transitioning to state "
               << static_cast<int>(newState) << std::endl;
 
+    // ===== SPECIAL CASE: PLAYING STATE =====
+    // PLAYING is handled by the Game class, not by ScreenManager
+    // So we just update the state and leave currentScreen as is
+    if (newState == GameState::PLAYING) {
+        currentState = newState;
+        std::cout << "[ScreenManager] Transitioning to PLAYING - Game class takes over" << std::endl;
+        return; // Don't proceed with normal screen setup
+    }
+
+    // ===== NORMAL CASE: UI STATES (MENU, SETTINGS, PAUSED, etc.) =====
+
     // If we have a current screen, clean it up
     // We DON'T delete it - just call cleanup() to delete its buttons
     // This allows us to reuse the screen if we return to this state

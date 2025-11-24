@@ -1,17 +1,21 @@
 /**
  * @file game.h
  * @author Ian Codding II
- * @brief 
+ * @brief Decleration of Game class - main gameplay logic
  * @version 0.1
  * @date 2025-10-21
- * 
+ *
  * @copyright Copyright (c) 2025
- * 
+ *
  */
 
 #pragma once
 
-#include <SFML/Graphics.hpp>
+#include "bullet.h"
+#include "Centipede_Segment.h"
+#include "Collision_Manager.h"
+#include "Game_State.h"
+#include "player.h"
 #include "ScreenManager.h"
 #include "player.h"
 
@@ -19,6 +23,18 @@
 
 
 
+// Forward declarations - these classes exist but we onl need pointers to them
+// This avoids circular includes
+class Player;
+class Centipede;
+class Bullet;
+class Mushroom;
+
+/**
+ * @class Game
+ * @brief Main game class that handels all gameplay logic
+ *
+ */
 class Game {
   public:
     Player player;
