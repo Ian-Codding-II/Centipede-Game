@@ -28,7 +28,7 @@ Mushroom::Mushroom(sf::Texture& texture, sf::IntRect spriteTexture, sf::Vector2i
     
     if (hp <= 0)
         mHealth = 1;
-    else if (hp > MAXHEALTH)
+    else if (hp >= MAXHEALTH)
         mHealth = MAXHEALTH;
     
     updateTexture();
@@ -82,7 +82,7 @@ void Mushroom::updateTexture() {
             } else if (mHealth > (MAXHEALTH * 0.25) and mHealth < (MAXHEALTH * 0.5)) { // If > 25% and < 50%
                 // Damaged Mushroom
                 setSpriteRect(sf::IntRect(8*10, 8*2, 8, 8));
-            } else if (mHealth > 0 and mHealth < (MAXHEALTH * 0.25)) { // If > 0 and < 25%
+            } else if (mHealth > 0 and mHealth <= (MAXHEALTH * 0.25)) { // If > 0 and < 25%
                 // Broken Mushroom
                 setSpriteRect(sf::IntRect(8*11, 8*2, 8, 8));
             }

@@ -10,7 +10,7 @@
  */
 #include <SFML/Graphics.hpp>
 #include <iostream>
-#include "mushroom.h"
+#include "../includes/mushroom.h"
 
 
 int main() {
