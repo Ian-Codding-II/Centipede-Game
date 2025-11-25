@@ -42,6 +42,6 @@ bin/        - Executable (auto-generated)
 ```
 
 ## Team Assignments
-- **Person A:** Game loop, state management, UI
-- **Person B:** Player, bullets, collision detection
-- **Person C:** Centipede AI, mushrooms, assets
+- **Ian Codding II:** Game loop, state management, UI
+- **Roman Salazar:** Player, bullets, collision detection
+- **Balin Becker:** Centipede AI, mushrooms, assets
