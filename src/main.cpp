@@ -213,6 +213,14 @@ int main() {
                 // Used to determine which system handles this event
                 GameState currentState = screenManager.getState();
 
+                // Check if the escape key was pressed.
+                if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Escape) {
+                    std::cout << "[ScreenManager] Escaped clicked - returning to previous screen if not in menu" << std::endl;
+                    if (currentState != GameState::MENU) {
+                        screenManager.setState(GameState::MENU);
+                    }
+                }
+
                 // ===== STATE-BASED EVENT HANDLING =====
 
                 /**

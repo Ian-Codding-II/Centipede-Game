@@ -144,14 +144,6 @@ void ScreenManager::update(sf::Event &event) {
         return;
     }
 
-    // Check if the escape key was pressed.
-    if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Escape) {
-        std::cout << "[ScreenManager] Escaped clicked - returning to previous screen if not in menu" << std::endl;
-        if (currentState != GameState::MENU) {
-            setState(GameState::MENU);
-        }
-    }
-
     // Call the current screen's update method
     // This processes the event and returns the next state to go to
     GameState nextState = currentScreen->update(event);
