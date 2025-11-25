@@ -1,0 +1,11 @@
+bob 10
+bob 9
+jhon 8
+jerry 7
+zzzz 0
+LLL 3000
+john 300
+bob 200
+jane 90
+frank 40
+

@@ -18,23 +18,25 @@
 #include <iostream>
 #ifndef PLAYER_H
 #define PLAYER_H
+#include "../includes/bullet.h"
 
 class Player
 {
     public:
-        
 
+        void startPlayer(sf::RectangleShape& rectangle, sf::Texture& playerTexture);
+        void movePlayer(sf::RectangleShape &playerRectangle);
+        bool boundsChecking(int x, int y);
+        void playerShoot(sf::RectangleShape& playerRect,sf::RectangleShape& bulletShape ,sf::Texture& bulletTexture,Bullet &projectile);
+
+        std::vector<sf::RectangleShape> bullets; 
 
 
     private:
 
 };
  
-void startPlayer(sf::RectangleShape& rectangle, sf::Texture& playerTexture);
-void changeBullet(sf::RectangleShape& bulletObj, sf::Texture& bulletTexture);
-void movePlayer(sf::RectangleShape &playerRectangle);
-bool boundsChecking(int x, int y);
-void playerShoot(const sf::Vector2f &bulletPath, sf::RectangleShape& bulletRectangle, sf::Texture& bulletTexture);
+
 
 
 
