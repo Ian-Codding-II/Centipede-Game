@@ -17,7 +17,7 @@ make run
 ```
 
 ## Team
-- Person A - Core Systems & UI
-- Person B - Player & Collision
-- Person C - AI & Environment
+- Ian Codding II - Core Systems & UI
+- Roman Salazar - Player & Collision
+- Balin Becker - AI & Environment
     
