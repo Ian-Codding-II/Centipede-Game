@@ -12,7 +12,7 @@
 #pragma once
 
 #include "bullet.h"
-#include "Centipede_Segment.h"
+#include "Centipede.h"
 #include "Collision_Manager.h"
 #include "Game_State.h"
 #include "player.h"
@@ -68,7 +68,7 @@ class Game {
 
     ~Game();
 
-    void initualize();
+    void initialize();
 
     void handleInput(const sf::Event &event);
 

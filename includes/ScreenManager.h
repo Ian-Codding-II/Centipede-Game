@@ -254,8 +254,7 @@ public:
      * @return Reference to the shared font
      */
     sf::Font& getFont() { return font; }
-    
-private:
+
     /**
      * @brief Get or create a screen for the given state
      * 

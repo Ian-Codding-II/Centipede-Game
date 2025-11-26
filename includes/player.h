@@ -1,13 +1,28 @@
 /**
- * @file player.h
+ * @file Player.h
  * @author Ian Codding II
- * @brief 
- * @version 0.1
- * @date 2025-10-21
- * 
+ * @brief Player class - the player-controlled character
+ * @version 1.0 - Grid-Based
+ * @date 2025-11-26
+ *
  * @copyright Copyright (c) 2025
- * 
+ *
+ * PLAYER MECHANICS:
+ *
+ * The player is a single character that moves on the grid.
+ * - Positioned at the bottom of the screen
+ * - Can move left/right/up/down one grid cell per input
+ * - Shoots bullets upward
+ * - Dies if hit by centipede
+ * - Respawns at starting position after death
+ *
+ * MOVEMENT:
+ * - Grid-based (one cell at a time)
+ * - WASD or Arrow keys to move
+ * - Bounded within playable area
  */
+
+
 
 // - Handle WASD/Arrow input
 // - Update position with speed

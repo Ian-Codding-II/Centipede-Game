@@ -52,12 +52,12 @@ SettingsScreen::SettingsScreen(sf::RenderWindow& win, sf::Font& fnt)
 
     titleText.setPosition(
         (1200 - titleText.getLocalBounds().width) / 2,
-        60
+        25
     );
     
     // Set up info text for displaying current values
     infoText.setFont(font);
-    infoText.setCharacterSize(20);
+    infoText.setCharacterSize(24);
     infoText.setFillColor(sf::Color::Yellow);
 }
 
@@ -70,23 +70,18 @@ SettingsScreen::~SettingsScreen() {
 }
 
 /**
- * @brief Initialize - create all buttons for this screen
+ * @brief Initialize - create all buttons and load player sprites
  * 
- * Creates 9 buttons total:
- * - 2 buttons for lives adjustment (+/-)
- * - 2 buttons for spawn level adjustment (+/-)
- * - 4 buttons for player icon selection (1, 2, 3, 4)
- * - 1 back button to return to main menu
- * 
- * Button constructor signature:
- * Button(std::string label, sf::Vector2f position, sf::Vector2f size, sf::Color color)
- * 
- * Layout (vertical):
- * - Title
- * - Lives: X  [-] [+]
- * - Spawn Level: X  [-] [+]
- * - Player Icon: [1] [2] [3] [4]
- * - Back button
+ * NEW: Loads player sprite textures for display
+ * Layout:
+ * - Title: CENTER TOP
+ * - LEFT SIDE:
+ *   - Lives: [label] [-] [value] [+]
+ *   - Level: [label] [-] [value] [+]
+ * - RIGHT SIDE:
+ *   - Player Icons: [sprite1] [sprite2] [sprite3] [sprite4]
+ *   - With yellow outline on selected
+ * - Back button: BOTTOM CENTER
  */
 void SettingsScreen::initialize() {
     std::cout << "[SettingsScreen] initialize() called" << std::endl;
@@ -94,25 +89,23 @@ void SettingsScreen::initialize() {
     float winWidth = 1200;
     float winHeight = 800;
     
-    // Button sizing proportional to CURRENT window
-    float smallButtonSize = 50;
-    float largeButtonWidth = 200;
-    float largeButtonHeight = 50;
     float centerX = winWidth / 2;
+    float leftSideX = winWidth * 0.15f;    // Far left side
+    float rightSideX = winWidth * 0.65f;   // Right side
     
-    // Positions as percentage of CURRENT window height
-    float livesY = winHeight * 0.30f;
+    // ========== LEFT SIDE: LIVES AND LEVEL ==========
+    
+    float livesY = winHeight * 0.25f;
     float levelY = winHeight * 0.45f;
-    float iconY = winHeight * 0.60f;
-    float backY = winHeight -100;
-
-    // ========== LIVES ADJUSTMENT ==========
+    float buttonSize = 50;
+    float spacing = 20;
+    
+    // ===== LIVES =====
     // Lives Down button (-)
-    // Positioned on the left side
     livesDownButton = new Button(
         "-",
-        sf::Vector2f(centerX - winWidth * 0.15f, livesY),
-        sf::Vector2f(smallButtonSize, smallButtonSize),
+        sf::Vector2f(leftSideX, livesY),
+        sf::Vector2f(buttonSize, buttonSize),
         sf::Color::Red
     );
     livesDownButton->setColorTextNormal(sf::Color::White);
@@ -120,23 +113,22 @@ void SettingsScreen::initialize() {
     std::cout << "[SettingsScreen] Created Lives Down button" << std::endl;
 
     // Lives Up button (+)
-    // Positioned to the right of the Down button
     livesUpButton = new Button(
         "+",
-        sf::Vector2f(centerX + winWidth * 0.15f, livesY),
-        sf::Vector2f(smallButtonSize, smallButtonSize),
+        sf::Vector2f(leftSideX + buttonSize + spacing * 3, livesY),
+        sf::Vector2f(buttonSize, buttonSize),
         sf::Color::Green
     );
     livesUpButton->setColorTextNormal(sf::Color::White);
     livesUpButton->setColorTextHover(sf::Color::Yellow);
     std::cout << "[SettingsScreen] Created Lives Up button" << std::endl;
     
-    // ========== SPAWN LEVEL ADJUSTMENT ==========
+    // ===== SPAWN LEVEL =====
     // Spawn Level Down button (-)
     levelDownButton = new Button(
         "-",
-        sf::Vector2f(centerX - winWidth * 0.15f, levelY),
-        sf::Vector2f(smallButtonSize, smallButtonSize),
+        sf::Vector2f(leftSideX, levelY),
+        sf::Vector2f(buttonSize, buttonSize),
         sf::Color::Red
     );
     levelDownButton->setColorTextNormal(sf::Color::White);
@@ -146,57 +138,72 @@ void SettingsScreen::initialize() {
     // Spawn Level Up button (+)
     levelUpButton = new Button(
         "+",
-        sf::Vector2f(centerX + winWidth * 0.15f, levelY),
-        sf::Vector2f(smallButtonSize, smallButtonSize),
+        sf::Vector2f(leftSideX + buttonSize + spacing * 3, levelY),
+        sf::Vector2f(buttonSize, buttonSize),
         sf::Color::Green
     );
     levelUpButton->setColorTextNormal(sf::Color::White);
     levelUpButton->setColorTextHover(sf::Color::Yellow);
     std::cout << "[SettingsScreen] Created Level Up button" << std::endl;
-    
 
-    // ========== PLAYER ICON SELECTION ==========
-    // Create 4 buttons numbered 1, 2, 3, 4 for player icon selection
-    // Space them evenly across the middle of the screen
-    // float iconStartX = (winWidth / 2) - (4 * (buttonWidth + spacing)) / 2;
+    // ========== RIGHT SIDE: PLAYER ICON SPRITES ==========
     
-    // Player icon buttons
-    float iconButtonSize = winHeight * 0.08f;
-    float iconStartX = centerX - (iconButtonSize * 2 + winWidth * 0.05f);
-    float iconSpacing = winWidth * 0.05f;
-
+    float iconY = winHeight * 0.30f;
+    float iconSize = 80;  // Size of each player sprite
+    float iconSpacing = 30;
+    
+    // Load player sprite texture
+    // This assumes you have 4 player sprites in a file or separate files
+    // TODO: Load your actual player sprite texture here
+    // For now, we'll just note where this should be loaded
+    
+    // Try to load player texture
+    if (!playerTexture.loadFromFile("assets/sprites/player.png")) {
+        logError("SettingsScreen", "Failed to load player sprite texture");
+        std::cout << "[SettingsScreen] Player sprites will not display" << std::endl;
+    } else {
+        std::cout << "[SettingsScreen] Player sprite texture loaded successfully" << std::endl;
+    }
+    
+    // Create 4 player icon displays
     for (int i = 0; i < 4; i++) {
-        // Convert number to string (1, 2, 3, 4)
-        std::string iconLabel = std::to_string(i + 1);
+        // Create a sprite for this player icon
+        sf::Sprite playerSprite;
+        playerSprite.setTexture(playerTexture);
         
-        // Create button at appropriate position
-        Button* iconButton = new Button(
-            iconLabel,
-            sf::Vector2f(iconStartX + i * (iconButtonSize + iconSpacing), iconY),
-            sf::Vector2f(iconButtonSize, iconButtonSize),
-            sf::Color::Blue
+        // Position the sprite
+        float iconX = rightSideX + i * (iconSize + iconSpacing);
+        playerSprite.setPosition(iconX, iconY);
+        
+        // Scale the sprite to fit the icon size
+        playerSprite.setScale(
+            iconSize / playerTexture.getSize().x,
+            iconSize / playerTexture.getSize().y
         );
-        iconButton->setColorTextNormal(sf::Color::White);
-        iconButton->setColorTextHover(sf::Color::Yellow);
         
-        // Add to vector
-        playerIconButtons.push_back(iconButton);
-        std::cout << "[SettingsScreen] Created Player Icon button " << (i + 1) << std::endl;
+        // Store the sprite for rendering
+        playerIconSprites.push_back(playerSprite);
+        
+        std::cout << "[SettingsScreen] Created Player Icon sprite " << (i + 1) << std::endl;
     }
 
     // ========== BACK BUTTON ==========
-    // Back button to return to main menu
-    // Centered at the bottom
+    // Back button to return to main menu - stays at bottom center
+    float backY = winHeight - 100;
+    float backButtonWidth = 200;
+    float backButtonHeight = 50;
+    
     backButton = new Button(
         "Back",
-        sf::Vector2f(centerX - largeButtonWidth*2, backY),
-        sf::Vector2f(largeButtonWidth, largeButtonHeight),
+        sf::Vector2f(centerX - backButtonWidth / 2, backY),
+        sf::Vector2f(backButtonWidth, backButtonHeight),
         sf::Color::Green
     );
     backButton->setColorTextNormal(sf::Color::Black);
     backButton->setColorTextHover(sf::Color::Yellow);
     std::cout << "[SettingsScreen] Created Back button" << std::endl;
 }
+
 
 /**
  * @brief Update - process events and handle setting changes
@@ -218,7 +225,6 @@ GameState SettingsScreen::update(sf::Event& event) {
     if (livesDownButton != nullptr) {
         livesDownButton->update(event, window);
         if (livesDownButton->getState() == clicked) {
-            // Decrease lives, but keep minimum of 1
             if (lives > 1) {
                 lives--;
                 std::cout << "[SettingsScreen] Lives decreased to " << lives << std::endl;
@@ -230,7 +236,6 @@ GameState SettingsScreen::update(sf::Event& event) {
     if (livesUpButton != nullptr) {
         livesUpButton->update(event, window);
         if (livesUpButton->getState() == clicked) {
-            // Increase lives, but keep maximum of 5
             if (lives < 50) {
                 lives++;
                 std::cout << "[SettingsScreen] Lives increased to " << lives << std::endl;
@@ -242,7 +247,6 @@ GameState SettingsScreen::update(sf::Event& event) {
     if (levelDownButton != nullptr) {
         levelDownButton->update(event, window);
         if (levelDownButton->getState() == clicked) {
-            // Decrease level, but keep minimum of 0
             if (spawnLevel > 0) {
                 spawnLevel--;
                 std::cout << "[SettingsScreen] Spawn level decreased to " << spawnLevel << std::endl;
@@ -254,20 +258,21 @@ GameState SettingsScreen::update(sf::Event& event) {
     if (levelUpButton != nullptr) {
         levelUpButton->update(event, window);
         if (levelUpButton->getState() == clicked) {
-            // Increase level (no upper limit)
             spawnLevel++;
             std::cout << "[SettingsScreen] Spawn level increased to " << spawnLevel << std::endl;
         }
     }
     
-    // Update all player icon selection buttons
-    for (long unsigned int i = 0; i < playerIconButtons.size(); i++) {
-        if (playerIconButtons[i] != nullptr) {
-            playerIconButtons[i]->update(event, window);
-            if (playerIconButtons[i]->getState() == clicked) {
-                // User clicked icon button i, so select it
-                selectedPlayerIcon = i;
-                std::cout << "[SettingsScreen] Player icon " << (i + 1) << " selected" << std::endl;
+    // Handle player icon selection (click on sprites on right side)
+    if (event.type == sf::Event::MouseButtonPressed) {
+        if (event.mouseButton.button == sf::Mouse::Left) {
+            // Check if any player icon sprite was clicked
+            for (int i = 0; i < static_cast<int>(playerIconSprites.size()); i++) {
+                if (playerIconSprites[i].getGlobalBounds().contains(
+                    window.mapPixelToCoords(sf::Mouse::getPosition(window)))) {
+                    selectedPlayerIcon = i;
+                    std::cout << "[SettingsScreen] Player icon " << (i + 1) << " selected" << std::endl;
+                }
             }
         }
     }
@@ -301,25 +306,24 @@ void SettingsScreen::render() {
     
     // Draw title
     window.draw(titleText);
-        
-    // ========== DRAW SETTINGS LABELS AND VALUES ==========
     
-    // Lives label and value
+    // ========== LEFT SIDE: LIVES AND LEVEL LABELS ==========
+    
+    float leftSideX = 1200 * 0.15f;
+    float livesY = 800 * 0.25f;
+    float levelY = 800 * 0.45f;
+    
+    // Lives label
     infoText.setString("Lives: " + std::to_string(lives));
-    infoText.setPosition(1200 / 2 - 150, 155);
+    infoText.setPosition(leftSideX + 80, livesY + 10);
     window.draw(infoText);
     
-    // Spawn Level label and value
-    infoText.setString("Spawn Level: " + std::to_string(spawnLevel));
-    infoText.setPosition(1200 / 2 - 150, 255);
+    // Spawn Level label
+    infoText.setString("Level: " + std::to_string(spawnLevel));
+    infoText.setPosition(leftSideX + 80, levelY + 10);
     window.draw(infoText);
     
-    // Player Icon label
-    infoText.setString("Player Icon:");
-    infoText.setPosition(1200 / 2 - 150, 355);
-    window.draw(infoText);
-    
-    // ========== DRAW BUTTONS ==========
+    // ========== DRAW BUTTONS (LIVES AND LEVEL) ==========
     
     // Draw Lives adjustment buttons
     if (livesDownButton != nullptr) {
@@ -337,30 +341,47 @@ void SettingsScreen::render() {
         window.draw(*levelUpButton);
     }
     
-    // Draw Player Icon buttons and highlight selected one
-    for (long unsigned int i = 0; i < playerIconButtons.size(); i++) {
-        if (playerIconButtons[i] != nullptr) {
-            window.draw(*playerIconButtons[i]);
+    // ========== RIGHT SIDE: PLAYER ICON SPRITES ==========
+    
+    float rightSideX = 1200 * 0.65f;
+    float iconY = 800 * 0.30f;
+    float iconSize = 80;
+    float iconSpacing = 30;
+    
+    // Draw player icon label
+    infoText.setString("Player Icon:");
+    infoText.setCharacterSize(24);
+    infoText.setPosition(rightSideX, iconY - 40);
+    window.draw(infoText);
+    
+    // Draw all player sprites
+    for (int i = 0; i < static_cast<int>(playerIconSprites.size()); i++) {
+        // Draw the sprite
+        window.draw(playerIconSprites[i]);
+        
+        // If this is the selected icon, draw a yellow outline around it
+        if (i == selectedPlayerIcon) {
+            float iconX = rightSideX + i * (iconSize + iconSpacing);
             
-            // If this is the selected icon, draw a yellow border around it
-            if (static_cast<int> (i) == selectedPlayerIcon) {
-                sf::RectangleShape highlight = 
-                    sf::RectangleShape(sf::Vector2f(50, 50));
-                
-                // Position highlight over the button
-                highlight.setPosition(
-                    playerIconButtons[i]->getPosition().x -2,
-                    playerIconButtons[i]->getPosition().y - 2
-                );
-                
-                // Make it look like a border
-                highlight.setFillColor(sf::Color::Transparent);
-                highlight.setOutlineThickness(3);
-                highlight.setOutlineColor(sf::Color::Yellow);
-                window.draw(highlight);
-            }
+            // Create a rectangle outline that matches the sprite bounds
+            sf::RectangleShape outline(sf::Vector2f(iconSize, iconSize));
+            
+            // ✅ FIX: Position the outline correctly
+            // The outline should be centered on the sprite position
+            outline.setPosition(iconX, iconY);
+            
+            // Make it transparent with just an outline
+            outline.setFillColor(sf::Color::Transparent);
+            outline.setOutlineThickness(4);  // 4 pixels thick border
+            outline.setOutlineColor(sf::Color::Yellow);
+            
+            window.draw(outline);
+            
+            std::cout << "[SettingsScreen] Drawing yellow outline at (" << iconX << ", " << iconY << ")" << std::endl;
         }
     }
+    
+    // ========== DRAW BACK BUTTON ==========
     
     // Draw Back button
     if (backButton != nullptr) {
@@ -369,7 +390,7 @@ void SettingsScreen::render() {
 }
 
 /**
- * @brief Cleanup - delete all buttons
+ * @brief Cleanup - delete all buttons and sprites
  * 
  * Called when transitioning away from this screen.
  * Deletes all button objects to free memory.
@@ -395,14 +416,8 @@ void SettingsScreen::cleanup() {
         levelUpButton = nullptr;
     }
     
-    // Delete all player icon buttons
-    for (long unsigned int i = 0; i < playerIconButtons.size(); i++) {
-        if (playerIconButtons[i] != nullptr) {
-            delete playerIconButtons[i];
-            playerIconButtons[i] = nullptr;
-        }
-    }
-    playerIconButtons.clear();
+    // Clear player icon sprites
+    playerIconSprites.clear();
     
     // Delete back button
     if (backButton != nullptr) {

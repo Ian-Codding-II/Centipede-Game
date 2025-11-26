@@ -134,7 +134,7 @@ int main() {
          * This must happen after the window is created (OpenGL context needs to exist)
          *
          * What initialize() does:
-         * 1. Loads the shared font from assets/fonts/college.ttf
+         * 1. Loads the shared font from assets/fonts/Balins_Font.ttf
          * 2. Creates the initial screen (MainMenuScreen for MENU state)
          * 3. Sets up all UI elements
          */
@@ -295,7 +295,7 @@ int main() {
                     if (game == nullptr) {
                         std::cout << "[main] Creating Game object for PLAYING state\n";
                         game = new Game(window, screenManager);
-                        game->initualize(); // Initialize the game (get settings, create objects)
+                        game->initialize(); // Initialize the game (get settings, create objects)
                         std::cout << "[main] Game initialized and ready to play\n";
                     }
 

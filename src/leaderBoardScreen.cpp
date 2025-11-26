@@ -48,14 +48,14 @@ LeaderboardScreen::LeaderboardScreen(sf::RenderWindow &win, sf::Font &fnt)
     titleText.setFillColor(sf::Color::Green);
     titleText.setPosition(
         (1200 - titleText.getLocalBounds().width) / 2,
-        60);
+        25);
 
     // Set up header text
     headerText.setFont(font);
-    headerText.setString("RANK  PLAYER NAME          SCORE");
-    headerText.setCharacterSize(30);
+    headerText.setString("RANK          PLAYER NAME          SCORE");
+    headerText.setCharacterSize(27);
     headerText.setFillColor(sf::Color::Yellow);
-    headerText.setPosition(50, 150);
+    headerText.setPosition(50, 170);
 }
 
 /**
@@ -331,21 +331,21 @@ void LeaderboardScreen::formatRankText() {
     rankTexts.clear();
 
     // Create text for each entry
-    float startY = 230;    // Y position for first entry
+    float startY = 240;    // Y position for first entry
     float lineHeight = 35; // Space between entries
 
     for (long unsigned int i = 0; i < entries.size(); i++) {
         sf::Text rankText;
         rankText.setFont(font);
-        rankText.setCharacterSize(24);
+        rankText.setCharacterSize(25);
         rankText.setFillColor(sf::Color::White);
 
         // Format: "1.  PlayerName:         Score"
         // Using string operands and space counting for nice formatting
         std::string line = std::to_string(i + 1) + "." +
-                           std::string(20 - (entries[i].name.length() + std::to_string(i + 1).length()), '-') +
+                           std::string(20 - (entries[i].name.length() + std::to_string(i + 1).length()), ' ') +
                            entries[i].name + ":" +
-                           std::string(20 - (std::to_string(entries[i].score).length()), '-') +
+                           std::string(20 - (std::to_string(entries[i].score).length()), ' ') +
                            std::to_string(entries[i].score);
 
         rankText.setString(line);

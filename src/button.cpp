@@ -13,7 +13,7 @@
 
 /**
  * @brief Construct a new Button:: Button object
- *  Default constructor that loads texture from file “button.png” and font from “college.ttf” file.
+ *  Default constructor that loads texture from file “button.png” and font from "Balins_Font.ttf” file.
  *  set texture for mButton, set the origin to the middle of the button (texture),
  *  set color to White, position to {300,100}, set state to normal, and scale to 100%
  *  set font for the text, set the size of the text to the half of Button size, set the origin to the middle of the text
@@ -46,8 +46,8 @@ Button::Button(std::string s, sf::Vector2f position, sf::Vector2f size, sf::Colo
     }
     mButton.setTexture(mTexture);
     
-    if (!mFont.loadFromFile("assets/fonts/college.ttf")) {
-        throw ResourceError("college.ttf not found - ensure font file is in working directory");
+    if (!mFont.loadFromFile("assets/fonts/Balins_Font.ttf")) {
+        throw ResourceError("Balins_Font.ttf not found - ensure font file is in working directory");
     }
     mText.setFont(mFont);
 
