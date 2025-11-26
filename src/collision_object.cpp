@@ -61,4 +61,19 @@ void c_obj::setSpriteRect(sf::IntRect spriteTexture) {
     mSprite.setTextureRect(spriteTexture);
 }
 
+/**
+ * @brief Sets sprite scale
+ */
+void c_obj::setScale(sf::Vector2i factor) {
+    mSprite.setScale(sf::Vector2f(factor.x, factor.y));
+}
 
+/**
+ * @brief 
+ * 
+ * @param target 
+ * @param states 
+ */
+void c_obj::draw(sf::RenderTarget& target,sf::RenderStates states) const {
+    target.draw(mSprite, states);
+}

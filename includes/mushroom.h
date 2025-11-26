@@ -38,7 +38,6 @@ public:
     void hit(int dmg);
 
     void update();
-    virtual void draw(sf::RenderTarget& target,sf::RenderStates states) const;
 
 private:
     void updateTexture();

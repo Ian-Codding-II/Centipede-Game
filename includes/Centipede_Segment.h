@@ -9,3 +9,19 @@
 // Each segment of the array follows after one another
 // Create an (array?) of segments
 
+#ifndef CENTIPEDE_H
+#define CENTIPEDE_H
+
+#include "collision_object.h"
+
+class centipede {
+public:
+
+
+private:
+    struct centipede_segment {
+        c_obj segment();
+    };
+};
+
+#endif

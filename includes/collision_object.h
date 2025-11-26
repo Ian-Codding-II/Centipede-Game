@@ -21,9 +21,12 @@ class c_obj : public sf::Drawable {
 
         void setPosition(sf::Vector2i pos);
         void setSpriteRect(sf::IntRect spriteTexture);
+        void setScale(sf::Vector2i factor);
 
         sf::Sprite getSprite() const {return mSprite;};
         sf::Vector2i getPosition() const {return mPosition;};
+
+        virtual void draw(sf::RenderTarget& target,sf::RenderStates states) const;
 
     protected:
         sf::Sprite mSprite;

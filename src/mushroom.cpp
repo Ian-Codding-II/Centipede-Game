@@ -119,13 +119,3 @@ void Mushroom::update() {
     updateTexture();
 }
 
-/**
- * @brief 
- * 
- * @param target 
- * @param states 
- */
-void Mushroom::draw(sf::RenderTarget& target,sf::RenderStates states) const {
-    target.draw(mSprite, states);
-}
-
