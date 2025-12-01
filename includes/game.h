@@ -1,99 +1,239 @@
 /**
  * @file game.h
  * @author Ian Codding II
- * @brief Decleration of Game class - main gameplay logic
- * @version 0.1
- * @date 2025-10-21
+ * @brief Main Game class - coordinates all gameplay
+ * @version 2.0 - Complete Integration
+ * @date 2025-11-26
  *
  * @copyright Copyright (c) 2025
- *
  */
 
 #pragma once
 
-#include "bullet.h"
-#include "Centipede.h"
-#include "Collision_Manager.h"
+#include <SFML/Graphics.hpp>
+#include <vector>
+#include <memory>
+
 #include "Game_State.h"
-#include "player.h"
 #include "ScreenManager.h"
 #include "SettingsScreen.h"
-#include <SFML/Graphics.hpp>
-#include <SFML/Graphics/RectangleShape.hpp>
-#include <SFML/Graphics/Text.hpp>
-#include <vector>
-
-// Forward declarations - these classes exist but we onl need pointers to them
-// This avoids circular includes
-class Player;
-class Centipede;
-class Bullet;
-class Mushroom;
+#include "GameGrid.h"
+#include "player.h"
+#include "Centipede.h"
+#include "bullet.h"
+#include "mushroom.h"
+#include "Collision_Manager.h"
 
 /**
  * @class Game
- * @brief Main game class that handels all gameplay logic
+ * @brief Main game class - manages all gameplay logic
  *
+ * Responsibilities:
+ * - Manage game state (playing, paused, game over)
+ * - Update all game objects each frame
+ * - Detect and handle collisions
+ * - Render all game objects
+ * - Handle score, lives, and level progression
+ * - Coordinate with ScreenManager for UI
  */
 class Game {
+public:
+    /**
+     * @brief Constructor - create the game
+     *
+     * @param win Reference to main window
+     * @param screenMngr Reference to ScreenManager
+     */
+    Game(sf::RenderWindow& win, ScreenManager& screenMngr);
 
-  private:
-    sf::RenderWindow &window;
-    ScreenManager &screenManager;
+    /**
+     * @brief Destructor - clean up all resources
+     */
+    ~Game();
 
+    // ===== INITIALIZATION =====
+
+    /**
+     * @brief Initialize a new game
+     *
+     * Called when player starts a new game.
+     * Sets up:
+     * - Grid system
+     * - Player at starting position
+     * - Initial centipede(s)
+     * - Mushroom obstacles
+     * - Loads settings from SettingsScreen
+     */
+    void initialize();
+
+    // ===== GAME LOOP =====
+
+    /**
+     * @brief Handle input events
+     *
+     * @param event SFML event from main loop
+     */
+    void handleInput(const sf::Event& event);
+
+    /**
+     * @brief Update all game logic
+     *
+     * @param dt Delta time since last frame (seconds)
+     */
+    void update(float dt);
+
+    /**
+     * @brief Render all game objects to screen
+     */
+    void render();
+
+    // ===== STATE MANAGEMENT =====
+
+    /**
+     * @brief Get current game state
+     *
+     * @return Current GameState (PLAYING, PAUSED, GAME_OVER, etc.)
+     */
+    GameState getState() const;
+
+    /**
+     * @brief Set game state (triggers transitions)
+     *
+     * @param newState State to transition to
+     */
+    void setState(GameState newState);
+
+    // ===== CLEANUP =====
+
+    /**
+     * @brief Clean up all game resources
+     *
+     * Called when game ends or transitioning to menu.
+     */
+    void cleanup();
+
+private:
+    // ===== REFERENCES =====
+    sf::RenderWindow& window;
+    ScreenManager& screenManager;
+
+    // ===== GAME STATE =====
     GameState currentState;
     bool isGameOver;
     bool isPaused;
 
+    // ===== GAME SYSTEMS =====
+    GameGrid* grid;
+    CollisionManager* collisionManager;
+
+    // ===== GAME OBJECTS =====
+    Player* player;
+    std::vector<Centipede*> centipedes;
+    std::vector<Bullet*> bullets;
+    std::vector<Mushroom*> mushrooms;
+
+    // ===== GAME STATS =====
     int score;
     int lives;
     int level;
 
-    Player *player;
-    Centipede *centipede;
-    // If we ever make the spider class,
-    // then we would have a pointer to spider
+    // ===== RENDERING =====
+    sf::Text scoreText;
+    sf::Text livesText;
+    sf::Text levelText;
+    sf::RectangleShape background;
 
-    std::vector<Bullet *> bullets;
-    std::vector<Mushroom *> mushrooms;
+    // ===== TEXTURES =====
+    sf::Texture playerTexture;
+    sf::Texture centipedeHeadTexture;
+    sf::Texture centipedeBodyTexture;
+    sf::Texture centipedeTailTexture;
+    sf::Texture mushroomTexture;
+    sf::Texture bulletTexture;
 
-    sf::Text scoreText; // Displays current score
-    sf::Text livesText; // Displays remaining lives
-    sf::Text levelText; // Displays current level
+    // ===== HELPER FUNCTIONS =====
 
-    sf::RectangleShape background; // Black background rectangle
+    /**
+     * @brief Load all game textures
+     *
+     * @return true if all textures loaded successfully
+     */
+    bool loadTextures();
 
-  public:
-    Game(sf::RenderWindow &win, ScreenManager &screenMngr);
+    /**
+     * @brief Generate mushroom obstacles
+     *
+     * Called during initialize() and when completing levels.
+     */
+    void generateMushrooms();
 
-    ~Game();
+    /**
+     * @brief Create initial centipede
+     */
+    void createInitialCentipede();
 
-    void initialize();
+    /**
+     * @brief Handle all collisions for this frame
+     */
+    void handleCollisions();
 
-    void handleInput(const sf::Event &event);
+    /**
+     * @brief Handle player input from keyboard
+     */
+    void handleKeyboardInput();
 
-    void update(float dt);
+    /**
+     * @brief Process bullet collisions with centipedes
+     */
+    void processBulletCentipedeCollisions();
 
-    void render();
+    /**
+     * @brief Process bullet collisions with mushrooms
+     */
+    void processBulletMushroomCollisions();
 
-    GameState getState() const;
+    /**
+     * @brief Check if player collides with any centipede
+     */
+    void checkPlayerCentipedeCollisions();
 
-    void cleanup();
+    /**
+     * @brief Handle level progression when centipede is destroyed
+     */
+    void completeLevel();
 
-    bool checkCollision();
+    /**
+     * @brief Handle player death
+     */
+    void playerDeath();
 
-    void addScore();
+    /**
+     * @brief Check game over condition
+     */
+    void checkGameOver();
 
-    bool loseLife();
+    /**
+     * @brief Clean up dead bullets
+     */
+    void cleanupDeadBullets();
 
-    void completLevel();
+    /**
+     * @brief Clean up destroyed mushrooms
+     */
+    void cleanupDestroyedMushrooms();
 
-    bool damageCentipedeSegment(int segmentIndex);
+    /**
+     * @brief Clean up dead centipedes
+     */
+    void cleanupDeadCentipedes();
 
-    void resetAfterDeath();
+    /**
+     * @brief Update UI text displays
+     */
+    void updateUI();
+
+    /**
+     * @brief Debug - print game state to console
+     */
+    void debugPrint() const;
 };
-// - Initialize SFML window
-// - Manage game states (Menu, Playing, Paused, GameOver)
-// - Handle state transitions
-// - Coordinate update loop
-// - Render all objects

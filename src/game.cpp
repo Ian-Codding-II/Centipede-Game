@@ -1,90 +1,95 @@
 /**
  * @file game.cpp
  * @author Ian Codding II
- * @brief Implementation of Game class - main gameplay logic
- * @version 0.1
- * @date 2025-10-21
+ * @brief Implementation of Game class
+ * @version 1.0 - Complete Integration
+ * @date 2025-11-26
  *
  * @copyright Copyright (c) 2025
- *
  */
+
 #include "../includes/game.h"
 #include "../includes/errorHandler.h"
-#include "../includes/ScreenManager.h"
-#include <SFML/Graphics/Color.hpp>
-#include <SFML/Graphics/RenderWindow.hpp>
+#include <iostream>
+#include <cstdlib>
 
 /**
- * @brief Construct a new Game:: Game object
- *
+ * @brief Constructor - create the game
  */
-Game::Game(sf::RenderWindow &win, ScreenManager &screenMngr)
-    : window(win)
-    , screenManager(screenMngr)
-    , currentState(GameState::PLAYING)
-    , isGameOver(false)
-    , isPaused(false)
-    , score(0)
-    , lives(3)
-    , level(1)
-    , player(nullptr)
-    , centipede(nullptr) {
+Game::Game(sf::RenderWindow& win, ScreenManager& screenMngr)
+    : window(win),
+      screenManager(screenMngr),
+      currentState(GameState::PLAYING),
+      isGameOver(false),
+      isPaused(false),
+      grid(nullptr),
+      collisionManager(nullptr),
+      player(nullptr),
+      score(0),
+      lives(3),
+      level(1) {
 
-    std::cout << "[Game] Constructor called\n";
+    std::cout << "[Game] Constructor called" << std::endl;
 
-    // ===== SET UP TEXT DISPLAYS =====
-    // IMPORTANT: Get the font from ScreenManager (shared font loaded there)
-    sf::Font &font = screenManager.getFont();
+    // Get font from ScreenManager
+    sf::Font& font = screenManager.getFont();
 
-    // Set up the black background
+    // Set up background
     background.setSize(sf::Vector2f(window.getSize().x, window.getSize().y));
     background.setPosition(0, 0);
     background.setFillColor(sf::Color::Black);
 
-    // Set up score text
+    // Set up text displays
     scoreText.setFont(font);
     scoreText.setCharacterSize(20);
     scoreText.setFillColor(sf::Color::Green);
     scoreText.setPosition(10, 10);
 
-    // Set up lives text
     livesText.setFont(font);
     livesText.setCharacterSize(20);
     livesText.setFillColor(sf::Color::Green);
     livesText.setPosition(window.getSize().x - 200, 10);
 
-    // Set up level text
     levelText.setFont(font);
     levelText.setCharacterSize(20);
     levelText.setFillColor(sf::Color::Green);
     levelText.setPosition(window.getSize().x / 2 - 50, 10);
 
-    std::cout << "[Game] Game object fully initialized\n";
-}
+    // Load textures
+    if (!loadTextures()) {
+        logError("Game", "Failed to load some textures");
+    }
 
-Game::~Game() {
+    std::cout << "[Game] Constructor completed" << std::endl;
 }
 
 /**
+ * @brief Destructor
+ */
+Game::~Game() {
+    std::cout << "[Game] Destructor called" << std::endl;
+    cleanup();
+}
+
+// ===== INITIALIZATION =====
+
+/**
  * @brief Initialize a new game
- *
- * Sets up a fresh game state:
- * - Resets score and lives
- * - Creates player at bottom center
- * - Creates centipede at top
- * - Populates mushroom obstacles
- * - Loads settings from SettingsScreen
- *
- * This is called:
- * 1. When game first starts
- * 2. When player clicks "Play Again" after Game Over
- * 3. When transitioning from MENU to PLAYING state
- *
  */
 void Game::initialize() {
-    std::cout << "[Game] initialize() called - starting new game" << std::endl;
+    std::cout << "[Game] initialize() called" << std::endl;
 
-    // ===== GET SETTINGS FROM SETTINGS SCREEN =====
+    // Create grid system
+    if (grid == nullptr) {
+        grid = new GameGrid(1200, 800);
+    }
+
+    // Create collision manager
+    if (collisionManager == nullptr) {
+        collisionManager = new CollisionManager(grid);
+    }
+
+    // Get settings from SettingsScreen
     SettingsScreen* settings = 
         (SettingsScreen*)screenManager.getScreen(GameState::SETTINGS);
 
@@ -92,260 +97,510 @@ void Game::initialize() {
         lives = settings->getLives();
         level = settings->getSpawnLevel();
         int playerIcon = settings->getSelectedPlayerIcon();
-        
+
         std::cout << "[Game] Loaded settings: Lives=" << lives
                   << ", Level=" << level
                   << ", PlayerIcon=" << playerIcon << std::endl;
-    } else {
-        logError("Game", "Could not get SettingsScreen - using defaults");
-        lives = 3;
-        level = 1;
     }
 
-    // ===== RESET SCORE (but keep from previous attempts? Your choice) =====
+    // Reset score
     score = 0;
     isGameOver = false;
     isPaused = false;
 
-    // ===== CREATE PLAYER =====
-    // Player starts at bottom center of screen
+    // Create player
     if (player == nullptr) {
-        player = new Player();
-        // You'll need to implement Player initialization based on your Player class
-        // Example: player->setPosition(window.getSize().x / 2, window.getSize().y - 50);
-        std::cout << "[Game] Player created" << std::endl;
+        player = new Player(grid, playerTexture);
     } else {
-        // If player already exists, just reset position
-        // player->reset();
+        player->reset();
     }
 
-    // ===== CREATE CENTIPEDE =====
-    // Centipede starts at top center with length based on level
-    if (centipede == nullptr) {
-        // centipede = new Centipede();
-        // Initialize centipede with head at (window center, top)
-        // Length = 10 + (level * 2)
-        // std::cout << "[Game] Centipede created with length: " << (10 + level * 2) << std::endl;
-    } else {
-        // If centipede already exists, reset it
-        // centipede->reset();
+    // Clear existing objects
+    for (auto centipede : centipedes) {
+        delete centipede;
     }
+    centipedes.clear();
 
-    // ===== CREATE MUSHROOM OBSTACLES =====
-    // Clear any existing mushrooms
+    for (auto bullet : bullets) {
+        delete bullet;
+    }
+    bullets.clear();
+
     for (auto mushroom : mushrooms) {
-        if (mushroom != nullptr) {
-            delete mushroom;
-        }
+        delete mushroom;
     }
     mushrooms.clear();
 
-    // Create random mushrooms scattered around the screen
-    // Roughly 15-20 mushrooms per level
-    int mushroomCount = 15 + (level * 2);
-    for (int i = 0; i < mushroomCount; i++) {
-        // Random position (not at top or bottom where player/centipede start)
-        float randX = 50 + rand() % (static_cast<int>(window.getSize().x) - 100);
-        float randY = 100 + rand() % (static_cast<int>(window.getSize().y) - 200);
+    // Create initial centipede
+    createInitialCentipede();
 
-        // Mushroom* mushroom = new Mushroom();
-        // mushroom->setPosition(randX, randY);
-        // mushrooms.push_back(mushroom);
-    }
-    std::cout << "[Game] Created " << mushrooms.size() << " mushrooms" << std::endl;
+    // Generate mushrooms
+    generateMushrooms();
 
-    std::cout << "[Game] Game initialization complete - ready to play!" << std::endl;
+    std::cout << "[Game] Game initialized - ready to play!" << std::endl;
 }
 
+// ===== GAME LOOP =====
+
 /**
- * @brief Handle keyboard and mouse input
- *
- * Processes player input:
- * - WASD / Arrow keys: Move player
- * - SPACE: Shoot bullet
- * - ESC: Pause game
- *
- * @param event The SFML event containing input information
+ * @brief Handle input
  */
 void Game::handleInput(const sf::Event& event) {
-    // Only process input if we're playing (not paused)
+    if (isGameOver) {
+        return;
+    }
+
+    if (event.type == sf::Event::KeyPressed) {
+        if (event.key.code == sf::Keyboard::Escape || event.key.code == sf::Keyboard::P) {
+            isPaused = !isPaused;
+            if (isPaused) {
+                currentState = GameState::PAUSED;
+                std::cout << "[Game] Paused" << std::endl;
+            } else {
+                currentState = GameState::PLAYING;
+                std::cout << "[Game] Resumed" << std::endl;
+            }
+        }
+    }
+
+    // Only handle game input if not paused
     if (isPaused) {
         return;
     }
 
-    // Keyboard input
-    if (event.type == sf::Event::KeyPressed) {
-        switch (event.key.code) {
-        case sf::Keyboard::Escape:
-            // Pause the game
-            isPaused = true;
-            currentState = GameState::PAUSED;
-            std::cout << "[Game] ESC pressed - pausing game" << std::endl;
-            break;
-
-        case sf::Keyboard::Space:
-            // Player shoots
-            if (player != nullptr) {
-                // player->shoot();
-                std::cout << "[Game] Player shot a bullet" << std::endl;
-            }
-            break;
-
-        case sf::Keyboard::Left:
-        case sf::Keyboard::A:
-            // Move player left (handled in update with continuous input)
-            break;
-
-        case sf::Keyboard::Right:
-        case sf::Keyboard::D:
-            // Move player right (handled in update with continuous input)
-            break;
-
-        default:
-            break;
-        }
-    }
-}
-
-void Game::update(float dt) {
-}
-
-void Game::render() {
-    // ===== DRAW BACKGROUND =====
-    // Black rectangle covering entire screen
-    window.draw(background);
-    // This will be at the top.
-
-    // There will be more to draw, but this will be at the bottom
-    // ===== DRAW UI TEXT =====
-    // Update and draw score text
-    scoreText.setString("Score: " + std::to_string(score));
-    window.draw(scoreText);
-
-    // Update and draw lives text
-    livesText.setString("Lives: " + std::to_string(lives));
-    window.draw(livesText);
-
-    // Update and draw level text
-    levelText.setString("Level: " + std::to_string(level));
-    window.draw(levelText);
+    // Continuous input handled in update()
 }
 
 /**
- * @brief Get the current game state
- *
- * Returns the current GameState enum value.
- * Used by main.cpp to determine whether to render game or UI.
- *
- * @return Current GameState (PLAYING, PAUSED, GAME_OVER, etc.)
+ * @brief Update game logic
+ */
+void Game::update(float dt) {
+    if (isPaused || isGameOver) {
+        return;
+    }
+
+    // Handle keyboard input (continuous)
+    handleKeyboardInput();
+
+    // Update player
+    if (player) {
+        player->update(dt);
+    }
+
+    // Update all centipedes
+    for (auto centipede : centipedes) {
+        if (centipede) {
+            centipede->update(dt);
+        }
+    }
+
+    // Update all bullets
+    for (auto bullet : bullets) {
+        if (bullet) {
+            bullet->update(dt);
+        }
+    }
+
+    // Update all mushrooms
+    for (auto mushroom : mushrooms) {
+        if (mushroom) {
+            mushroom->update(dt);
+        }
+    }
+
+    // Update UI
+    updateUI();
+
+    // Handle all collisions
+    handleCollisions();
+
+    // Clean up dead objects
+    cleanupDeadBullets();
+    cleanupDestroyedMushrooms();
+    cleanupDeadCentipedes();
+
+    // Check win/lose conditions
+    checkGameOver();
+    if (centipedes.empty() && !isGameOver) {
+        completeLevel();
+    }
+
+    // Update UI
+    updateUI();
+}
+
+/**
+ * @brief Render all objects
+ */
+void Game::render() {
+    // Draw background
+    window.draw(background);
+
+    // Draw mushrooms
+    for (auto mushroom : mushrooms) {
+        if (mushroom) {
+            window.draw(*mushroom);
+        }
+    }
+
+    // Draw centipedes
+    for (auto centipede : centipedes) {
+        if (centipede) {
+            window.draw(*centipede);
+        }
+    }
+
+    // Draw bullets
+    for (auto bullet : bullets) {
+        if (bullet && bullet->isAlive()) {
+            window.draw(*bullet);
+        }
+    }
+
+    // Draw player
+    if (player) {
+        window.draw(*player);
+    }
+
+    // Draw UI text
+    window.draw(scoreText);
+    window.draw(livesText);
+    window.draw(levelText);
+}
+
+// ===== STATE MANAGEMENT =====
+
+/**
+ * @brief Get current state
  */
 GameState Game::getState() const {
     return currentState;
 }
 
+/**
+ * @brief Set game state
+ */
+void Game::setState(GameState newState) {
+    if (newState != currentState) {
+        currentState = newState;
+        std::cout << "[Game] State changed to " << static_cast<int>(newState) << std::endl;
+    }
+}
+
+// ===== CLEANUP =====
+
+/**
+ * @brief Clean up all resources
+ */
 void Game::cleanup() {
-}
+    std::cout << "[Game] cleanup() called" << std::endl;
 
-bool Game::checkCollision() {
-}
-
-/**
- * @brief Add points to the score
- *
- * Increases score and updates the score text.
- * Called when:
- * - Bullet hits centipede segment
- * - Bullet hits mushroom
- * - Enemy is defeated
- *
- * Could also check for leaderboard qualifications here.
- *
- * @param points Points to add to score
- */
-void Game::addScore() {
-    // This should probably take an int parameter for points
-    // For now, we'll add 10 points
-    score += 10;
-    std::cout << "[Game] Score increased to " << score << std::endl;
-}
-
-/**
- * @brief Remove one life from the player
- *
- * Called when player collides with centipede.
- * Decreases lives counter and checks for game over.
- *
- * @return true if game is over (no lives left), false otherwise
- */
-bool Game::loseLife() {
-    lives--;
-    std::cout << "[Game] Lost a life! Lives remaining: " << lives << std::endl;
-
-    if (lives <= 0) {
-        isGameOver = true;
-        return true;
+    // Delete player
+    if (player != nullptr) {
+        delete player;
+        player = nullptr;
     }
-    return false;
-}
 
-/**
- * @brief Complete current level
- *
- * Called when centipede is completely destroyed.
- * Increases level and spawns new centipede.
- *
- * Could also:
- * - Award bonus points for completing level
- * - Speed up centipede for next level
- * - Add more mushrooms for next level
- * - Show level complete message
- */
-void Game::completLevel() {
-    level++;
-    std::cout << "[Game] Level " << (level - 1) << " complete! Moving to level " << level << std::endl;
-
-    // Reset centipede for new level
-    if (centipede != nullptr) {
+    // Delete centipedes
+    for (auto centipede : centipedes) {
         delete centipede;
-        // centipede = new Centipede();
-        // centipede->setLevel(level);  // Increase speed/length for new level
     }
+    centipedes.clear();
 
-    // Award bonus points
-    addScore();
-}
-
-bool Game::damageCentipedeSegment(int segmentIndex) {
-}
-
-/**
- * @brief Reset after player death
- *
- * Called after player loses a life.
- * Resets:
- * - Player position to starting position
- * - Removes player's bullets
- * - Centipede continues moving
- *
- * If lives > 0: Game continues
- * If lives <= 0: Game over
- */
-void Game::resetAfterDeath() {
-    std::cout << "[Game] Resetting after death..." << std::endl;
-
-    // Clear player's bullets
+    // Delete bullets
     for (auto bullet : bullets) {
-        if (bullet != nullptr) {
-            delete bullet;
-        }
+        delete bullet;
     }
     bullets.clear();
 
-    // Reset player to starting position
-    if (player != nullptr) {
-        // player->reset();  // Reset position to bottom center
-        // player->resetShootCooldown();
+    // Delete mushrooms
+    for (auto mushroom : mushrooms) {
+        delete mushroom;
+    }
+    mushrooms.clear();
+
+    // Delete systems
+    if (collisionManager != nullptr) {
+        delete collisionManager;
+        collisionManager = nullptr;
     }
 
-    std::cout << "[Game] Reset complete" << std::endl;
+    if (grid != nullptr) {
+        delete grid;
+        grid = nullptr;
+    }
+
+    std::cout << "[Game] Cleanup completed" << std::endl;
+}
+
+// ===== PRIVATE HELPER FUNCTIONS =====
+
+/**
+ * @brief Load all textures
+ */
+bool Game::loadTextures() {
+    bool allLoaded = true;
+
+    // Load single atlas texture that contains all sprites
+    if (!playerTexture.loadFromFile("assets/sprites/atlas.png")) {
+        logError("Game", "Failed to load atlas texture");
+        return false;
+    }
+
+    // All textures point to the same atlas, but use different IntRects
+    centipedeHeadTexture = playerTexture;
+    centipedeBodyTexture = playerTexture;
+    centipedeTailTexture = playerTexture;
+    mushroomTexture = playerTexture;
+    bulletTexture = playerTexture;
+
+    std::cout << "[Game] Atlas texture loaded successfully" << std::endl;
+    return true;
+}
+
+/**
+ * @brief Generate mushroom obstacles
+ */
+void Game::generateMushrooms() {
+    // Generate 15-20 mushrooms based on level
+    int mushroomCount = 15 + (level * 2);
+
+    for (int i = 0; i < mushroomCount; i++) {
+        auto [gridX, gridY] = grid->getRandomEmptyCell();
+
+        Mushroom* mushroom = new Mushroom(grid, mushroomTexture, gridX, gridY, 4, NORMAL);
+        mushrooms.push_back(mushroom);
+    }
+
+    std::cout << "[Game] Generated " << mushrooms.size() << " mushrooms" << std::endl;
+}
+
+/**
+ * @brief Create initial centipede
+ */
+void Game::createInitialCentipede() {
+    int length = 10 + (level * 2);  // Longer centipedes on higher levels
+
+    Centipede* centipede = new Centipede(
+        grid,
+        centipedeHeadTexture,
+        centipedeBodyTexture,
+        centipedeTailTexture,
+        length,
+        MOVING_RIGHT
+    );
+
+    centipedes.push_back(centipede);
+
+    std::cout << "[Game] Created centipede with " << length << " segments" << std::endl;
+}
+
+/**
+ * @brief Handle all collisions
+ */
+void Game::handleCollisions() {
+    processBulletCentipedeCollisions();
+    processBulletMushroomCollisions();
+    checkPlayerCentipedeCollisions();
+}
+
+/**
+ * @brief Handle keyboard input
+ */
+void Game::handleKeyboardInput() {
+    if (!player) return;
+
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left) || sf::Keyboard::isKeyPressed(sf::Keyboard::A)) {
+        player->moveLeft();
+    }
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right) || sf::Keyboard::isKeyPressed(sf::Keyboard::D)) {
+        player->moveRight();
+    }
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up) || sf::Keyboard::isKeyPressed(sf::Keyboard::W)) {
+        player->moveUp();
+    }
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down) || sf::Keyboard::isKeyPressed(sf::Keyboard::S)) {
+        player->moveDown();
+    }
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space)) {
+        if (player->canShoot()) {
+            auto [bulletX, bulletY] = player->shoot();
+
+            if (bulletX >= 0 && bulletY >= 0) {
+                Bullet* bullet = new Bullet(grid, bulletTexture, bulletX, bulletY);
+                bullets.push_back(bullet);
+            }
+        }
+    }
+}
+
+/**
+ * @brief Process bullet vs centipede collisions
+ */
+void Game::processBulletCentipedeCollisions() {
+    for (int b = 0; b < static_cast<int>(bullets.size()); b++) {
+        if (!bullets[b] || !bullets[b]->isAlive()) {
+            continue;
+        }
+
+        for (int c = 0; c < static_cast<int>(centipedes.size()); c++) {
+            if (!centipedes[c]) {
+                continue;
+            }
+
+            CollisionResult result = collisionManager->checkBulletCentipede(bullets[b], centipedes[c]);
+
+            if (result.collided) {
+                bullets[b]->kill();
+                score += 100;
+
+                Centipede* newCentipede = centipedes[c]->shootSegment(result.data);
+
+                if (newCentipede != nullptr) {
+                    centipedes.push_back(newCentipede);
+                }
+
+                break;
+            }
+        }
+    }
+}
+
+/**
+ * @brief Process bullet vs mushroom collisions
+ */
+void Game::processBulletMushroomCollisions() {
+    for (int b = 0; b < static_cast<int>(bullets.size()); b++) {
+        if (!bullets[b] || !bullets[b]->isAlive()) {
+            continue;
+        }
+
+        Mushroom* hitMushroom = collisionManager->checkBulletMushroom(bullets[b], mushrooms);
+
+        if (hitMushroom) {
+            bullets[b]->kill();
+
+            if (hitMushroom->takeDamage()) {
+                score += 10;  // Mushroom destroyed
+            } else {
+                score += 5;   // Mushroom damaged
+            }
+        }
+    }
+}
+
+/**
+ * @brief Check player vs centipede collisions
+ */
+void Game::checkPlayerCentipedeCollisions() {
+    if (!player) return;
+
+    if (collisionManager->checkPlayerCentipedes(player, centipedes)) {
+        playerDeath();
+    }
+}
+
+/**
+ * @brief Complete level
+ */
+void Game::completeLevel() {
+    level++;
+    score += 1000;  // Bonus for level completion
+
+    std::cout << "[Game] Level complete! Moving to level " << level << std::endl;
+
+    // Clear mushrooms
+    for (auto mushroom : mushrooms) {
+        delete mushroom;
+    }
+    mushrooms.clear();
+
+    // Create new centipede and mushrooms
+    createInitialCentipede();
+    generateMushrooms();
+}
+
+/**
+ * @brief Handle player death
+ */
+void Game::playerDeath() {
+    lives--;
+    std::cout << "[Game] Player died! Lives remaining: " << lives << std::endl;
+
+    if (lives > 0) {
+        player->reset();
+    }
+}
+
+/**
+ * @brief Check game over
+ */
+void Game::checkGameOver() {
+    if (lives <= 0) {
+        isGameOver = true;
+        currentState = GameState::GAME_OVER;
+        std::cout << "[Game] GAME OVER! Final score: " << score << std::endl;
+    }
+}
+
+/**
+ * @brief Clean up dead bullets
+ */
+void Game::cleanupDeadBullets() {
+    for (int i = 0; i < static_cast<int>(bullets.size()); i++) {
+        if (!bullets[i]->isAlive()) {
+            delete bullets[i];
+            bullets.erase(bullets.begin() + i);
+            i--;
+        }
+    }
+}
+
+/**
+ * @brief Clean up destroyed mushrooms
+ */
+void Game::cleanupDestroyedMushrooms() {
+    for (int i = 0; i < static_cast<int>(mushrooms.size()); i++) {
+        if (mushrooms[i]->isDestroyed()) {
+            delete mushrooms[i];
+            mushrooms.erase(mushrooms.begin() + i);
+            i--;
+        }
+    }
+}
+
+/**
+ * @brief Clean up dead centipedes
+ */
+void Game::cleanupDeadCentipedes() {
+    for (int i = 0; i < static_cast<int>(centipedes.size()); i++) {
+        if (!centipedes[i]->isAlive()) {
+            delete centipedes[i];
+            centipedes.erase(centipedes.begin() + i);
+            i--;
+        }
+    }
+}
+
+/**
+ * @brief Update UI text
+ */
+void Game::updateUI() {
+    scoreText.setString("Score: " + std::to_string(score));
+    livesText.setString("Lives: " + std::to_string(lives));
+    levelText.setString("Level: " + std::to_string(level));
+}
+
+/**
+ * @brief Debug print
+ */
+void Game::debugPrint() const {
+    std::cout << "\n[Game] Debug Info:" << std::endl;
+    std::cout << "  Score: " << score << std::endl;
+    std::cout << "  Lives: " << lives << std::endl;
+    std::cout << "  Level: " << level << std::endl;
+    std::cout << "  Centipedes: " << centipedes.size() << std::endl;
+    std::cout << "  Bullets: " << bullets.size() << std::endl;
+    std::cout << "  Mushrooms: " << mushrooms.size() << std::endl;
+    std::cout << std::endl;
 }

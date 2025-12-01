@@ -199,7 +199,7 @@ Centipede* Centipede::shootSegment(int segmentIndex) {
         std::cout << "[Centipede] Segment removed. Remaining: " << segments.size() << std::endl;
     }
 
-    // Reassign segment types to maintain correct textures
+    // ✅ FIX: Reassign segment types to maintain correct textures
     // After removing head or tail, we need to update all segment type indices
     for (int i = 0; i < static_cast<int>(segments.size()); i++) {
         segments[i].segmentType = i;
@@ -276,7 +276,7 @@ int Centipede::getSegmentAtPosition(int gridX, int gridY) const {
 /**
  * @brief Draw all segments
  *
- * Each segment uses its appropriate texture (head, body, or tail).
+ * Each segment uses its appropriate texture rect from the atlas (head, body, or tail).
  */
 void Centipede::draw(sf::RenderTarget& target, sf::RenderStates states) const {
     for (int i = 0; i < static_cast<int>(segments.size()); i++) {
@@ -285,24 +285,31 @@ void Centipede::draw(sf::RenderTarget& target, sf::RenderStates states) const {
         // Create sprite for this segment
         sf::Sprite sprite;
 
-        // Determine which texture to use
+        // All sprites use the same texture
+        sprite.setTexture(headTexture);  // All use same texture (atlas)
+
+        // Determine which texture rect to use based on segment type
+        sf::IntRect textureRect;
+
         if (i == 0) {
-            // Head segment
-            sprite.setTexture(headTexture);
+            // Head segment - TODO: Adjust these coordinates to match your atlas
+            textureRect = sf::IntRect(0, 0, 32, 32);  // Head position in atlas
         } else if (i == static_cast<int>(segments.size()) - 1) {
             // Tail segment
-            sprite.setTexture(tailTexture);
+            textureRect = sf::IntRect(64, 0, 32, 32);  // Tail position in atlas
         } else {
             // Body segment
-            sprite.setTexture(bodyTexture);
+            textureRect = sf::IntRect(32, 0, 32, 32);  // Body position in atlas
         }
+
+        sprite.setTextureRect(textureRect);
 
         // Position sprite at grid cell center
         sf::Vector2f pixelPos = grid->gridToCenterPixel(segment.gridX, segment.gridY);
         sprite.setPosition(pixelPos);
 
         // Center the sprite on the cell
-        sprite.setOrigin(sprite.getLocalBounds().width / 2, sprite.getLocalBounds().height / 2);
+        sprite.setOrigin(16, 16);  // 32x32 / 2 = 16
 
         target.draw(sprite, states);
     }
