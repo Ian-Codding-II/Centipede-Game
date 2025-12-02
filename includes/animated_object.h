@@ -15,8 +15,8 @@ public:
     anim_obj(sf::Texture& texture, sf::IntRect StartFrame, int frames);
     void update(float deltaTime);
 private:
-    sf::Vector2i mPos;
-    sf::Vector2i mSize;
+    sf::Vector2f mPos;
+    sf::Vector2f mSize;
     int mFrames, frameCount = 0;
 
     const float fps = 0.15;

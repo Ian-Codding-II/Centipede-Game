@@ -7,7 +7,7 @@
 
 #include "../includes/centipede.h"
 
-centipede::centipede(sf::Texture& Texture, int length, sf::Vector2i position, sf::Vector2i factor) {
+centipede::centipede(sf::Texture& Texture, int length, sf::Vector2f position, sf::Vector2i factor) {
     mPosition = position;
     for (int i = 0; i < length; i++) {
         if (i == length - 1) {
@@ -34,7 +34,7 @@ centipede::centipede(sf::Texture& Texture, int length, sf::Vector2i position, sf
  * 
  * @param position Position to place at
  */
-void centipede::setPosition(sf::Vector2i position) {
+void centipede::setPosition(sf::Vector2f position) {
     for (segment seg : mCentipedeVect) {
         seg.mSprite->setPosition(position);
     }
@@ -56,14 +56,14 @@ void centipede::setScale(sf::Vector2i factor) {
  * 
  * @param position Position to move to
  */
-void centipede::move(sf::Vector2i position) {
+void centipede::move(sf::Vector2f position) {
     segment* Head = &mCentipedeVect.back();
-    // Move head toward position once
-    // If segment behind is able to move, move
-    // repeat until head is on position and all segments are in line
     float distance = sqrt(pow(abs(position.x - mPosition.x), 2) - pow(abs(position.y - mPosition.y), 2));
     for (int i = 0; i < distance; i++) {
 
+        if (Head->mSprite->getPosition() == position) {
+            // Catch up rest of centipede
+        }
     }
 }
 

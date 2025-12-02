@@ -29,7 +29,7 @@ class Mushroom : public c_obj{
     //Draw
 public:
 
-    Mushroom(sf::Texture& texture, sf::IntRect spriteTexture = sf::IntRect(0, 0, 8, 8), sf::Vector2i pos = sf::Vector2i(0, 0), int hp = MAXHEALTH, bool isSuper = false);
+    Mushroom(sf::Texture& texture, sf::IntRect spriteTexture = sf::IntRect(0, 0, 8, 8), sf::Vector2f pos = sf::Vector2f(0, 0), int hp = MAXHEALTH, bool isSuper = false);
 
     // Default destructor;
     ~Mushroom() {};

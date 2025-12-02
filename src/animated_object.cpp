@@ -7,9 +7,9 @@
 
 #include "../includes/animated_object.h"
 
-anim_obj::anim_obj(sf::Texture& texture, sf::IntRect StartFrame, int frames) : c_obj(texture, StartFrame, sf::Vector2i(0, 0)) {
-    mSize = StartFrame.getSize();
-    mPos = StartFrame.getPosition();
+anim_obj::anim_obj(sf::Texture& texture, sf::IntRect StartFrame, int frames) : c_obj(texture, StartFrame, sf::Vector2f(0, 0)) {
+    mSize = sf::Vector2f(StartFrame.getSize().x, StartFrame.getSize().y);
+    mPos = sf::Vector2f(StartFrame.getPosition().x, StartFrame.getPosition().y);
     mFrames = frames;
 
 }

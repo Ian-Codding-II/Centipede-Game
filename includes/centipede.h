@@ -18,16 +18,16 @@
 
 class centipede {
 public:
-    centipede(sf::Texture& Texture) : centipede(Texture, 8, sf::Vector2i(0, 0), sf::Vector2i(1, 1)) {};
-    centipede(sf::Texture& Texture, int length,sf::Vector2i position, sf::Vector2i factor);
+    centipede(sf::Texture& Texture) : centipede(Texture, 8, sf::Vector2f(0, 0), sf::Vector2i(1, 1)) {};
+    centipede(sf::Texture& Texture, int length, sf::Vector2f position, sf::Vector2i factor);
 
     // Returns head position
-    sf::Vector2i getPosition() {return mPosition;};
+    sf::Vector2f getPosition() {return mPosition;};
 
-    void setPosition(sf::Vector2i position);
+    void setPosition(sf::Vector2f position);
 
     void setScale(sf::Vector2i factor);
-    void move(sf::Vector2i position);
+    void move(sf::Vector2f position);
     void fall();
 
 private:
@@ -41,7 +41,7 @@ private:
     };
 
     std::vector<segment> mCentipedeVect;
-    sf::Vector2i mPosition;
+    sf::Vector2f mPosition;
     int mSpacing;
     
 };
