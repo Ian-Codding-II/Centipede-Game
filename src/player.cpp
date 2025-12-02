@@ -1,335 +1,328 @@
-// /**
-//  * @file player.cpp
-//  * @author Ian Codding II Roman Salazar
-//  * @brief
-//  * @version 0.1
-//  * @date 2025-10-21
-//  *
-//  * @copyright Copyright (c) 2025
-//  *
-//  */
-
-// #include "../includes/player.h"
-// #include <iostream>
-// #include <SFML/Graphics.hpp>
-
-// void Player::startPlayer(sf::RectangleShape &rectangle, sf::Texture &playerTexture) {
-//     // Rectangle for player
-//     rectangle.setSize(sf::Vector2f(30.f, 30.f));
-//     rectangle.setOutlineColor(sf::Color::Black);
-//     // rectangle.setOutlineThickness(5.f); // Do we need this?
-//     rectangle.setPosition(400.f, 500.f);
-
-//     // Load player texture
-//     if (!playerTexture.loadFromFile("/home/roman/CS151/Final/assets/HqCreature.png")) {
-//         std::cerr << "There was an issue loading the player texture...\n";
-//     }
-//     std::cout << "Success loading player texture...\n";
-
-//     // Apply texture to rectangle
-//     rectangle.setTexture(&playerTexture);
-// }
-
-// void Player::movePlayer(sf::RectangleShape &playerRectangle) {
-//     sf::Vector2f pos = playerRectangle.getPosition();
-//     std::cout << "The current player position is equal to x: " << pos.x << " and y: " << pos.y << '\n';
-
-//     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left) || sf::Keyboard::isKeyPressed(sf::Keyboard::A) && boundsChecking(pos.x, pos.y)) {
-//         if (boundsChecking(pos.x - 15, pos.y))
-//             ;
-//         playerRectangle.setPosition(pos.x - 15, pos.y); // Move left 20 pixels
-
-//     } else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right) || sf::Keyboard::isKeyPressed(sf::Keyboard::D) && boundsChecking(pos.x, pos.y)) {
-//         if (boundsChecking(pos.x + 15, pos.y))
-//             ;
-//         playerRectangle.setPosition(pos.x + 15, pos.y); // Move right 20 pixels
-
-//     } else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down) || sf::Keyboard::isKeyPressed(sf::Keyboard::S) && boundsChecking(pos.x, pos.y)) {
-//         if (boundsChecking(pos.x, pos.y + 15))
-//             ;
-//         playerRectangle.setPosition(pos.x, pos.y + 15); // Move down 20 pixels
-//     } else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up) || sf::Keyboard::isKeyPressed(sf::Keyboard::W) && boundsChecking(pos.x, pos.y)) {
-//         if (boundsChecking(pos.x, pos.y - 15))
-//             ;
-//         playerRectangle.setPosition(pos.x, pos.y - 15); // Move up 20 pixels
-//     }
-
-//     // This is temporary bounds checking. Intentionally rough
-//     if (pos.x <= 5 && pos.y > 405) {
-//         playerRectangle.setPosition(6, pos.y); // Seems to work
-//     } else if (pos.x <= 5 && pos.y <= 405) {
-//         playerRectangle.setPosition(pos.x + 1, 406);
-//     } else if (pos.y < 405) {
-//         playerRectangle.setPosition(pos.x, 406);
-
-//     } else if (pos.x > 795 && pos.y <= 595) {
-//         playerRectangle.setPosition(770, pos.y);
-//     } else if (pos.x > 795 && pos.y >= 595) {
-//         playerRectangle.setPosition(pos.x - 1, pos.y - 1);
-//     } else if (pos.y >= 595) {
-//         playerRectangle.setPosition(pos.x, 570);
-//     }
-// }
-
-// bool Player::boundsChecking(int x, int y) {
-//     if (x >= 795 || y <= 405 || x <= 5 || y <= 595) {
-//         return 0;
-//     }
-//     return 1;
-// }
-
-// void Player::playerShoot(sf::RectangleShape &playerRect, sf::RectangleShape &bulletShape, sf::Texture &bulletTexture, Bullet &projectile) {
-//     sf::Vector2f pos;
-//     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space)) {
-//         pos = playerRect.getPosition();
-//         std::cout << "Current bullet position x: " << pos.x << " y: " << pos.y << '\n';
-//         projectile.bullets.push_back(bulletShape);
-//         // std::cout << projectile.bullets.size();
-//         bulletShape.setPosition(pos.x, pos.y);
-//     }
-// }
-
 /**
  * @file player.cpp
- * @author Ian Codding II
+ * @author Roman Salazar Ian Codding II
  * @brief Implementation of Player class
  * @version 2.0 - Grid-Based
  * @date 2025-11-26
  *
  * @copyright Copyright (c) 2025
  */
-
 #include "../includes/player.h"
+#include "../includes/bullet.h"
 #include <iostream>
+#include <SFML/Graphics.hpp>
 
-/**
- * @brief Constructor - create the player
- *
- * Initializes player at bottom center of screen.
- *
- * @param grid Pointer to GameGrid
- * @param texture Reference to player sprite texture
- */
-Player::Player(GameGrid* grid, sf::Texture& texture)
-    : grid(grid),
-      texture(texture),
-      shootCooldown(0.0f),
-      shootCooldownMax(0.2f) {
+void Player::startPlayer(sf::RectangleShape &rectangle, sf::Texture &playerTexture) {
+    // Rectangle for player
+    rectangle.setSize(sf::Vector2f(30.f, 30.f));
+    rectangle.setOutlineColor(sf::Color::Black);
+    // rectangle.setOutlineThickness(5.f); // Do we need this?
+    rectangle.setPosition(400.f, 500.f);
 
-    std::cout << "[Player] Constructor called" << std::endl;
+    // Load player texture
 
-    // Start at bottom center
-    startGridX = grid->getGridWidth() / 2;
-    startGridY = grid->getGridHeight() - 2;  // 2 cells from bottom
-
-    gridX = startGridX;
-    gridY = startGridY;
-
-    // Mark player on grid
-    updateGridOccupancy();
-
-    std::cout << "[Player] Player created at (" << gridX << ", " << gridY << ")" << std::endl;
-}
-
-/**
- * @brief Destructor
- */
-Player::~Player() {
-    std::cout << "[Player] Destructor called" << std::endl;
-    clearFromGrid();
-}
-
-// ===== MOVEMENT =====
-
-/**
- * @brief Move player left
- */
-bool Player::moveLeft() {
-    return tryMove(gridX - 1, gridY);
-}
-
-/**
- * @brief Move player right
- */
-bool Player::moveRight() {
-    return tryMove(gridX + 1, gridY);
-}
-
-/**
- * @brief Move player up
- */
-bool Player::moveUp() {
-    return tryMove(gridX, gridY - 1);
-}
-
-/**
- * @brief Move player down
- */
-bool Player::moveDown() {
-    return tryMove(gridX, gridY + 1);
-}
-
-/**
- * @brief Reset player to starting position
- */
-void Player::reset() {
-    std::cout << "[Player] Resetting to starting position" << std::endl;
-    clearFromGrid();
-
-    gridX = startGridX;
-    gridY = startGridY;
-    shootCooldown = 0.0f;
-
-    updateGridOccupancy();
-}
-
-// ===== POSITION & COLLISION =====
-
-/**
- * @brief Get current position
- */
-std::pair<int, int> Player::getPosition() const {
-    return std::make_pair(gridX, gridY);
-}
-
-/**
- * @brief Get global bounds
- */
-sf::FloatRect Player::getGlobalBounds() const {
-    float pixelX = grid->gridToPixelX(gridX);
-    float pixelY = grid->gridToPixelY(gridY);
-
-    return sf::FloatRect(pixelX, pixelY, GameGrid::CELL_SIZE, GameGrid::CELL_SIZE);
-}
-
-/**
- * @brief Check if player is at position
- */
-bool Player::isAt(int checkX, int checkY) const {
-    return gridX == checkX && gridY == checkY;
-}
-
-// ===== SHOOTING =====
-
-/**
- * @brief Fire a bullet
- *
- * Returns the grid position where bullet should spawn (one cell above player).
- *
- * @return (gridX, gridY - 1) where bullet spawns
- */
-std::pair<int, int> Player::shoot() {
-    if (canShoot()) {
-        shootCooldown = shootCooldownMax;
-        std::cout << "[Player] Shot fired from (" << gridX << ", " << gridY << ")" << std::endl;
-        return std::make_pair(gridX, gridY - 1);
+    if (!playerTexture.loadFromFile("/home/roman/CS151/Final/assets/HqCreature.png")) // Absolute path seems to work
+    {
+        std::cerr << "There was an issue loading the player texture...\n";
+    } else {
+        std::cout << "Success loading player texture...\n";
     }
 
-    return std::make_pair(-1, -1);  // Invalid - can't shoot
+    // Apply texture to rectangle
+    rectangle.setTexture(&playerTexture);
 }
 
-/**
- * @brief Check if can shoot
- */
-bool Player::canShoot() const {
-    return shootCooldown <= 0.0f;
-}
+void Player::movePlayer(sf::RectangleShape &playerRectangle) {
+    sf::Vector2f pos = playerRectangle.getPosition();
+    std::cout << "The current player position is equal to x: " << pos.x << " and y: " << pos.y << '\n';
 
-/**
- * @brief Set shoot cooldown
- */
-void Player::setShootCooldown(float cooldown) {
-    shootCooldownMax = cooldown;
-}
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left) || sf::Keyboard::isKeyPressed(sf::Keyboard::A) && boundsChecking(pos.x, pos.y)) {
+        if (boundsChecking(pos.x - 15, pos.y))
+            ;
+        playerRectangle.setPosition(pos.x - 15, pos.y); // Move left 20 pixels
 
-// ===== RENDERING =====
+    } else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right) || sf::Keyboard::isKeyPressed(sf::Keyboard::D) && boundsChecking(pos.x, pos.y)) {
+        if (boundsChecking(pos.x + 15, pos.y))
+            ;
+        playerRectangle.setPosition(pos.x + 15, pos.y); // Move right 20 pixels
 
-/**
- * @brief Draw player
- */
-void Player::draw(sf::RenderTarget& target, sf::RenderStates states) const {
-    sf::Sprite sprite(texture);
+    } else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down) || sf::Keyboard::isKeyPressed(sf::Keyboard::S) && boundsChecking(pos.x, pos.y)) {
+        if (boundsChecking(pos.x, pos.y + 15))
+            ;
+        playerRectangle.setPosition(pos.x, pos.y + 15); // Move down 20 pixels
+    } else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up) || sf::Keyboard::isKeyPressed(sf::Keyboard::W) && boundsChecking(pos.x, pos.y)) {
+        if (boundsChecking(pos.x, pos.y - 15))
+            ;
+        playerRectangle.setPosition(pos.x, pos.y - 15); // Move up 20 pixels
+    }
 
-    // Set texture rect for player in atlas - TODO: Adjust to match your atlas
-    sprite.setTextureRect(sf::IntRect(0, 32, 32, 32));  // Player position in atlas
+    // This is temporary bounds checking. Intentionally rough
+    if (pos.x <= 5 && pos.y > 405) {
+        playerRectangle.setPosition(6, pos.y); // Seems to work
+    } else if (pos.x <= 5 && pos.y <= 405) {
+        playerRectangle.setPosition(pos.x + 1, 406);
+    } else if (pos.y < 405) {
+        playerRectangle.setPosition(pos.x, 406);
 
-    sf::Vector2f pixelPos = grid->gridToCenterPixel(gridX, gridY);
-    sprite.setPosition(pixelPos);
-
-    // Center sprite on cell
-    sprite.setOrigin(16, 16);  // 32x32 / 2 = 16
-
-    target.draw(sprite, states);
-}
-
-// ===== UPDATE =====
-
-/**
- * @brief Update player state
- */
-void Player::update(float dt) {
-    // Update shoot cooldown
-    if (shootCooldown > 0.0f) {
-        shootCooldown -= dt;
-        if (shootCooldown < 0.0f) {
-            shootCooldown = 0.0f;
-        }
+    } else if (pos.x > 795 && pos.y <= 595) {
+        playerRectangle.setPosition(770, pos.y);
+    } else if (pos.x > 795 && pos.y >= 595) {
+        playerRectangle.setPosition(pos.x - 1, pos.y - 1);
+    } else if (pos.y >= 595) {
+        playerRectangle.setPosition(pos.x, 570);
     }
 }
 
-// ===== DEBUG =====
-
-/**
- * @brief Debug print
- */
-void Player::debugPrint() const {
-    std::cout << "\n[Player] Debug Info:" << std::endl;
-    std::cout << "  Position: (" << gridX << ", " << gridY << ")" << std::endl;
-    std::cout << "  Start: (" << startGridX << ", " << startGridY << ")" << std::endl;
-    std::cout << "  Can Shoot: " << (canShoot() ? "Yes" : "No") << std::endl;
-    std::cout << "  Cooldown: " << shootCooldown << "s" << std::endl;
-    std::cout << std::endl;
-}
-
-// ===== PRIVATE =====
-
-/**
- * @brief Try to move to new position
- *
- * Checks bounds and collisions before moving.
- */
-bool Player::tryMove(int newX, int newY) {
-    // Check bounds
-    if (!grid->isInBounds(newX, newY)) {
-        return false;
+bool Player::boundsChecking(int x, int y) {
+    if (x >= 795 || y <= 405 || x <= 5 || y <= 595) {
+        return 0;
     }
+    return 1;
+}
 
-    // Check for collision (can't move through mushrooms or centipede)
-    if (grid->isOccupied(newX, newY, MUSHROOM | CENTIPEDE)) {
-        return false;
+void Player::playerShoot(sf::RectangleShape &playerRect, sf::RectangleShape &bulletShape, sf::Texture &bulletTexture, Bullet &projectile) {
+    sf::Vector2f pos;
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space)) {
+        pos = playerRect.getPosition();
+        std::cout << "Current bullet position x: " << pos.x << " y: " << pos.y << '\n';
+        projectile.bullets.push_back(bulletShape);
+
+        // std::cout << projectile.bullets.size();
+        bulletShape.setPosition(pos.x + 9, pos.y);
     }
-
-    // Movement is valid
-    clearFromGrid();
-
-    gridX = newX;
-    gridY = newY;
-
-    updateGridOccupancy();
-
-    return true;
 }
 
-/**
- * @brief Update grid occupancy
- */
-void Player::updateGridOccupancy() {
-    grid->setOccupied(gridX, gridY, PLAYER);
-}
+// #include "../includes/player.h"
+// #include <iostream>
 
-/**
- * @brief Clear from grid
- */
-void Player::clearFromGrid() {
-    grid->clearOccupied(gridX, gridY, PLAYER);
-}
+// /**
+//  * @brief Constructor - create the player
+//  *
+//  * Initializes player at bottom center of screen.
+//  *
+//  * @param grid Pointer to GameGrid
+//  * @param texture Reference to player sprite texture
+//  */
+// Player::Player(GameGrid* grid, sf::Texture& texture)
+//     : grid(grid),
+//       texture(texture),
+//       shootCooldown(0.0f),
+//       shootCooldownMax(0.2f) {
+
+//     std::cout << "[Player] Constructor called" << std::endl;
+
+//     // Start at bottom center
+//     startGridX = grid->getGridWidth() / 2;
+//     startGridY = grid->getGridHeight() - 2;  // 2 cells from bottom
+
+//     gridX = startGridX;
+//     gridY = startGridY;
+
+//     // Mark player on grid
+//     updateGridOccupancy();
+
+//     std::cout << "[Player] Player created at (" << gridX << ", " << gridY << ")" << std::endl;
+// }
+
+// /**
+//  * @brief Destructor
+//  */
+// Player::~Player() {
+//     std::cout << "[Player] Destructor called" << std::endl;
+//     clearFromGrid();
+// }
+
+// // ===== MOVEMENT =====
+
+// /**
+//  * @brief Move player left
+//  */
+// bool Player::moveLeft() {
+//     return tryMove(gridX - 1, gridY);
+// }
+
+// /**
+//  * @brief Move player right
+//  */
+// bool Player::moveRight() {
+//     return tryMove(gridX + 1, gridY);
+// }
+
+// /**
+//  * @brief Move player up
+//  */
+// bool Player::moveUp() {
+//     return tryMove(gridX, gridY - 1);
+// }
+
+// /**
+//  * @brief Move player down
+//  */
+// bool Player::moveDown() {
+//     return tryMove(gridX, gridY + 1);
+// }
+
+// /**
+//  * @brief Reset player to starting position
+//  */
+// void Player::reset() {
+//     std::cout << "[Player] Resetting to starting position" << std::endl;
+//     clearFromGrid();
+
+//     gridX = startGridX;
+//     gridY = startGridY;
+//     shootCooldown = 0.0f;
+
+//     updateGridOccupancy();
+// }
+
+// // ===== POSITION & COLLISION =====
+
+// /**
+//  * @brief Get current position
+//  */
+// std::pair<int, int> Player::getPosition() const {
+//     return std::make_pair(gridX, gridY);
+// }
+
+// /**
+//  * @brief Get global bounds
+//  */
+// sf::FloatRect Player::getGlobalBounds() const {
+//     float pixelX = grid->gridToPixelX(gridX);
+//     float pixelY = grid->gridToPixelY(gridY);
+
+//     return sf::FloatRect(pixelX, pixelY, GameGrid::CELL_SIZE, GameGrid::CELL_SIZE);
+// }
+
+// /**
+//  * @brief Check if player is at position
+//  */
+// bool Player::isAt(int checkX, int checkY) const {
+//     return gridX == checkX && gridY == checkY;
+// }
+
+// // ===== SHOOTING =====
+
+// /**
+//  * @brief Fire a bullet
+//  *
+//  * Returns the grid position where bullet should spawn (one cell above player).
+//  *
+//  * @return (gridX, gridY - 1) where bullet spawns
+//  */
+// std::pair<int, int> Player::shoot() {
+//     if (canShoot()) {
+//         shootCooldown = shootCooldownMax;
+//         std::cout << "[Player] Shot fired from (" << gridX << ", " << gridY << ")" << std::endl;
+//         return std::make_pair(gridX, gridY - 1);
+//     }
+
+//     return std::make_pair(-1, -1);  // Invalid - can't shoot
+// }
+
+// /**
+//  * @brief Check if can shoot
+//  */
+// bool Player::canShoot() const {
+//     return shootCooldown <= 0.0f;
+// }
+
+// /**
+//  * @brief Set shoot cooldown
+//  */
+// void Player::setShootCooldown(float cooldown) {
+//     shootCooldownMax = cooldown;
+// }
+
+// // ===== RENDERING =====
+
+// /**
+//  * @brief Draw player
+//  */
+// void Player::draw(sf::RenderTarget& target, sf::RenderStates states) const {
+//     sf::Sprite sprite(texture);
+
+//     // Set texture rect for player in atlas - TODO: Adjust to match your atlas
+//     sprite.setTextureRect(sf::IntRect(0, 32, 32, 32));  // Player position in atlas
+
+//     sf::Vector2f pixelPos = grid->gridToCenterPixel(gridX, gridY);
+//     sprite.setPosition(pixelPos);
+
+//     // Center sprite on cell
+//     sprite.setOrigin(16, 16);  // 32x32 / 2 = 16
+
+//     target.draw(sprite, states);
+// }
+
+// // ===== UPDATE =====
+
+// /**
+//  * @brief Update player state
+//  */
+// void Player::update(float dt) {
+//     // Update shoot cooldown
+//     if (shootCooldown > 0.0f) {
+//         shootCooldown -= dt;
+//         if (shootCooldown < 0.0f) {
+//             shootCooldown = 0.0f;
+//         }
+//     }
+// }
+
+// // ===== DEBUG =====
+
+// /**
+//  * @brief Debug print
+//  */
+// void Player::debugPrint() const {
+//     std::cout << "\n[Player] Debug Info:" << std::endl;
+//     std::cout << "  Position: (" << gridX << ", " << gridY << ")" << std::endl;
+//     std::cout << "  Start: (" << startGridX << ", " << startGridY << ")" << std::endl;
+//     std::cout << "  Can Shoot: " << (canShoot() ? "Yes" : "No") << std::endl;
+//     std::cout << "  Cooldown: " << shootCooldown << "s" << std::endl;
+//     std::cout << std::endl;
+// }
+
+// // ===== PRIVATE =====
+
+// /**
+//  * @brief Try to move to new position
+//  *
+//  * Checks bounds and collisions before moving.
+//  */
+// bool Player::tryMove(int newX, int newY) {
+//     // Check bounds
+//     if (!grid->isInBounds(newX, newY)) {
+//         return false;
+//     }
+
+//     // Check for collision (can't move through mushrooms or centipede)
+//     if (grid->isOccupied(newX, newY, MUSHROOM | CENTIPEDE)) {
+//         return false;
+//     }
+
+//     // Movement is valid
+//     clearFromGrid();
+
+//     gridX = newX;
+//     gridY = newY;
+
+//     updateGridOccupancy();
+
+//     return true;
+// }
+
+// /**
+//  * @brief Update grid occupancy
+//  */
+// void Player::updateGridOccupancy() {
+//     grid->setOccupied(gridX, gridY, PLAYER);
+// }
+
+// /**
+//  * @brief Clear from grid
+//  */
+// void Player::clearFromGrid() {
+//     grid->clearOccupied(gridX, gridY, PLAYER);
+// }
