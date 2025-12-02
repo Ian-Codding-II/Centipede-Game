@@ -1,13 +1,13 @@
 /**
- * @file    centipede.cpp
+ * @file    Centipede.cpp
  * @author  Balin Becker
  * @brief   Centipede class definitions
  * @date    2025-10-21
  */
 
-#include "centipede.h"
+#include "../includes/Centipede.h"
 
-centipede::centipede(sf::Texture& Texture, int length, sf::Vector2i factor) {
+Centipede::Centipede(sf::Texture& Texture, int length, sf::Vector2i factor) {
     for (int i = 0; i < length; i++) {
         if (i == length - 1) {
             // Create a head
@@ -30,7 +30,7 @@ centipede::centipede(sf::Texture& Texture, int length, sf::Vector2i factor) {
  * 
  * @param factor Factor to scale by
  */
-void centipede::setScale(sf::Vector2i factor) {
+void Centipede::setScale(sf::Vector2i factor) {
     for (segment seg : mCentipedeVect) {
         seg.mSprite->setScale(factor);
     }
@@ -41,7 +41,7 @@ void centipede::setScale(sf::Vector2i factor) {
  * 
  * @param position Position to move to
  */
-void centipede::move(sf::Vector2i position) {
+void Centipede::move(sf::Vector2i position) {
     // Move head toward position once
     // If segment behind is able to move, move
     // repeat until head is on position and all segments are in line
@@ -50,7 +50,7 @@ void centipede::move(sf::Vector2i position) {
 /**
  * @brief Causes centipede to fall the ground
  */
-void centipede::fall() {
+void Centipede::fall() {
 
 }
 
