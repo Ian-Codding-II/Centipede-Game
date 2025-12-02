@@ -26,9 +26,8 @@ Grid::Grid(sf::FloatRect Region, int cellSize) {
 sf::Vector2f Grid::GetPosition(sf::Vector2f position) {
     float snapX = std::floor(position.x / mCellSize) * mCellSize;
     float snapY = std::floor(position.y / mCellSize) * mCellSize;
-
-    snapX = std::clamp(snapX, mRegion.left, mRegion.left + mRegion.width - mCellSize);
-    snapY = std::clamp(snapY, mRegion.top, mRegion.top + mRegion.height - mCellSize);
+    snapX = std::clamp(snapX, mRegion.left + mCellSize, mRegion.left + mRegion.width - mCellSize);
+    snapY = std::clamp(snapY, mRegion.top + mCellSize, mRegion.top + mRegion.height - mCellSize);
     return sf::Vector2f(snapX, snapY);
 }
 

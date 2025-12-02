@@ -21,6 +21,7 @@ c_obj::c_obj(sf::Texture& texture, sf::IntRect spriteTexture, sf::Vector2f pos) 
     mSprite.setTextureRect(spriteTexture);
 
     mSprite.setPosition(pos.x, pos.y);
+    mPosition = pos;
 
     objects.push_back(this);
 }
@@ -50,6 +51,7 @@ std::vector<c_obj*> c_obj::getCollided() {
  */
 void c_obj::setPosition(sf::Vector2f pos) {
     mSprite.setPosition(pos.x, pos.y);
+    mPosition = pos;
 }
 
 /**
