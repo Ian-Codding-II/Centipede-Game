@@ -14,11 +14,17 @@
 
 #include "animated_object.h"
 #include <vector>
+#include <cmath>
 
 class centipede {
 public:
-    centipede(sf::Texture& Texture) : centipede(Texture, 8, sf::Vector2i(1, 1)) {};
-    centipede(sf::Texture& Texture, int length, sf::Vector2i factor);
+    centipede(sf::Texture& Texture) : centipede(Texture, 8, sf::Vector2i(0, 0), sf::Vector2i(1, 1)) {};
+    centipede(sf::Texture& Texture, int length,sf::Vector2i position, sf::Vector2i factor);
+
+    // Returns head position
+    sf::Vector2i getPosition() {return mPosition;};
+
+    void setPosition(sf::Vector2i position);
 
     void setScale(sf::Vector2i factor);
     void move(sf::Vector2i position);
@@ -35,6 +41,7 @@ private:
     };
 
     std::vector<segment> mCentipedeVect;
+    sf::Vector2i mPosition;
     int mSpacing;
     
 };

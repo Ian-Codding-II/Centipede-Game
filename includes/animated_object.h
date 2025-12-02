@@ -19,7 +19,7 @@ private:
     sf::Vector2i mSize;
     int mFrames, frameCount = 0;
 
-    const float fps = 0.5;
+    const float fps = 0.15;
     float totalElapsed = 0.0;
 };
 

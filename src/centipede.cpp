@@ -5,23 +5,38 @@
  * @date    2025-10-21
  */
 
-#include "centipede.h"
+#include "../includes/centipede.h"
 
-centipede::centipede(sf::Texture& Texture, int length, sf::Vector2i factor) {
+centipede::centipede(sf::Texture& Texture, int length, sf::Vector2i position, sf::Vector2i factor) {
+    mPosition = position;
     for (int i = 0; i < length; i++) {
         if (i == length - 1) {
             // Create a head
             anim_obj headSeg(Texture, sf::IntRect(0, 8*1, 8, 8), 4);
             segment head(headSeg, "Head");
             head.mSprite->setScale(factor);
+            head.mSprite->setPosition(mPosition);
             mCentipedeVect.push_back(head);
         } else {
             // Create a segment
             anim_obj sSegment(Texture, sf::IntRect(0, 0, 8, 8), 4);
             segment seg(sSegment, "Segment");
             seg.mSprite->setScale(factor);
+            seg.mSprite->setPosition(mPosition);
             mCentipedeVect.push_back(seg);
         }
+    }
+
+}
+
+/**
+ * @brief Places all centipede segments at position
+ * 
+ * @param position Position to place at
+ */
+void centipede::setPosition(sf::Vector2i position) {
+    for (segment seg : mCentipedeVect) {
+        seg.mSprite->setPosition(position);
     }
 }
 
@@ -42,9 +57,14 @@ void centipede::setScale(sf::Vector2i factor) {
  * @param position Position to move to
  */
 void centipede::move(sf::Vector2i position) {
+    segment* Head = &mCentipedeVect.back();
     // Move head toward position once
     // If segment behind is able to move, move
     // repeat until head is on position and all segments are in line
+    float distance = sqrt(pow(abs(position.x - mPosition.x), 2) - pow(abs(position.y - mPosition.y), 2));
+    for (int i = 0; i < distance; i++) {
+
+    }
 }
 
 /**
