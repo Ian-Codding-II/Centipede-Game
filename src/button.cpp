@@ -207,7 +207,7 @@ void Button::update(sf::Event &e, sf::RenderWindow &window) {
 }
 
 /**
- * @brief drows to the target
+ * @brief draws to the target
  * 
  * @param target 
  * @param states 

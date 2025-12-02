@@ -18,11 +18,17 @@
 class Bullet
 {
     public:
+       // float shootCooldown = 0.2f;  // Temp
+        //float timeSinceLastShot = 0.0f; // Temp
+
         void startBullet(sf::RectangleShape& bulletObj, sf::Texture& bulletTexture);
+        int isShooting(sf::RectangleShape& playerRect,sf::RectangleShape& bulletShape ,sf::Texture& bulletTexture,Bullet &projectile, float deltaTime);
         int getPlayerPosition();
         sf::Vector2f bulletPath{0.f, -1.f};
+
         std::vector<sf::RectangleShape> bullets;
 
+        
     private:
 };
 

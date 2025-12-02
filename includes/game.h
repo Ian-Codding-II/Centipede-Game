@@ -17,7 +17,7 @@
 #include "Game_State.h"
 #include "player.h"
 #include "ScreenManager.h"
-#include "player.h"
+#include "mushroom.h"
 
 //class Player;
 
@@ -44,16 +44,38 @@ class Game {
     sf::RectangleShape bulletShape;
     sf::Texture bulletTexture;
     sf::RenderWindow& window;
-    
+    int bulletCount = 0;
+    std::vector<Mushroom> mushrooms;
+
+
     Game();
     Game(sf::RenderWindow& win, ScreenManager& sm);
     ~Game() {};
 
-    void handleInput(sf::RectangleShape& playerShape, Player* player);
+    void handleInput(sf::RectangleShape& playrect, Player* obj, Bullet* obj2, float dt);
     void update(float time);
     void render();
     bool isDone() const;
     void initializeGame();
+    void cleanup();
+
+    bool checkCollision(); 
+
+    void addScore(); 
+
+    bool loseLife() ;
+
+    void completLevel();
+
+    bool damageCentipedeSegment(int segmentIndex);
+
+    void resetAfterDeath(); 
+
+    GameState getState() const;
+
+
+
+
   private:
     
 

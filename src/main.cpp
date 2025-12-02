@@ -172,8 +172,7 @@ int main() {
             /**
              * Calculate delta time (time since last frame in seconds)
              *
-             * clock.restart() does two things:
-             * 1. Returns the elapsed time since the last call (or creation)
+             * clock.restart() does two things:wr creation)
              * 2. Resets the clock to 0
              *
              * .asSeconds() converts the time to seconds as a float
@@ -290,9 +289,9 @@ int main() {
                         
                         if(game){ // TEMP
 
-                            game->handleInput();
+                            //game->handleInput();
                             //game.update(dt);
-                            game->render();
+                            //game->render();
                          }
                         //  game.handleInput(event);
                          break;
@@ -318,6 +317,7 @@ int main() {
             GameState currentState = screenManager.getState();
 
             if (currentState == GameState::PLAYING) {
+                
                 /**
                  * Gameplay update
                  * Called every frame with delta time to:
@@ -330,16 +330,19 @@ int main() {
                  * IMPORTANT: Pass dt to ensure frame-independent movement!
                  * Without dt, movement would be frame-dependent and vary with FPS.
                  */
+                   
+                   
                 if (game != nullptr) {
                     game->update(dt);
 
                     // Check if Game class changed state (e.g., PLAYING -> PAUSED or GAME_OVER)
+                    /*
                     GameState newState = game->getState();
                     if (newState != currentState) {
                         std::cout << "[main] Game changed state from PLAYING to "
                                   << static_cast<int>(newState) << std::endl;
                         screenManager.setState(newState);
-                    }
+                    } */
                 }
 
             } else {
@@ -369,7 +372,14 @@ int main() {
                   * Render gameplay
                   * Draws: background, mushrooms, centipede, bullets, player, HUD
                   */
-                //  game.render();
+                    if(game!=nullptr)
+                    {
+                        game->handleInput(game->playerShape, &game->player, &game->bullet, dt);
+                        //game->update(dt);
+                        game->render();
+        
+                    }
+                 
              } else {
                  /**
                   * Render UI screen

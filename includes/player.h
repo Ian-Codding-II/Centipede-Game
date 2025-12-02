@@ -25,11 +25,10 @@ class Player
     public:
 
         void startPlayer(sf::RectangleShape& rectangle, sf::Texture& playerTexture);
-        void movePlayer(sf::RectangleShape &playerRectangle);
+        void movePlayer(sf::RectangleShape &playerRectangle, float deltaTime);
         bool boundsChecking(int x, int y);
-        void playerShoot(sf::RectangleShape& playerRect,sf::RectangleShape& bulletShape ,sf::Texture& bulletTexture,Bullet &projectile);
+        bool playerShoot(sf::RectangleShape& playerRect,sf::RectangleShape& bulletShape ,sf::Texture& bulletTexture,Bullet &projectile);
 
-        std::vector<sf::RectangleShape> bullets; 
 
 
     private:

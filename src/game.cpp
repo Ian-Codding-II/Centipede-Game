@@ -21,34 +21,32 @@
 
  
     
-    Game::Game(sf::RenderWindow& win, ScreenManager& sm) : window(win) 
-    {
-        initializeGame();
-    }
-    void Game::handleInput(sf::RectangleShape& playrect, Player* obj)
+    
+    void Game::handleInput(sf::RectangleShape& playrect, Player* obj, Bullet* obj2, float dt)
     {
         
-        obj->movePlayer(playrect);
-        obj->playerShoot(playrect,bulletShape,bulletTexture,bullet);
+        obj->movePlayer(playrect,dt);
+        //obj->playerShoot(playrect,bulletShape,bulletTexture,bullet);
+        obj2->isShooting(playrect,bulletShape,bulletTexture,bullet,dt);
 
     }
     void Game::update(float time)
     { 
         sf::Vector2f position = bulletShape.getPosition();
-        float speed = 300.f;           
-        position.y -= speed * time;      
-        bulletShape.setPosition(position);
-        if(position.y <= 5)
+        float speed = 1400.f;           
+        for (auto& b : bullet.bullets)
         {
-            // Delete the bullet object.
+            b.move(0.f, -speed * time); // move upward TEMPORARY
         }
+        bullet.isShooting(playerShape, bulletShape, bulletTexture, bullet, time);
+        for (auto& m : mushrooms) {
+        m.update();
+        }
+        
 
     }
-    void Game::render()
-    {
-       window.draw(playerShape);
-       window.draw(bulletShape);
-    }
+
+    
     bool Game::isDone() const
     {
         return true;
@@ -59,6 +57,12 @@
 
         player.startPlayer(playerShape,playerTexture); // This essentially loads both the player shape and texture together
         bullet.startBullet(bulletShape,bulletTexture);
+        sf::Texture& mushroomTexture = mushroomTexture; // Load this earlier or reuse a loaded texture
+        for (int y = 100; y <= 500; y += 50) {
+            for (int x = 100; x <= 1100; x += 50) {
+                mushrooms.emplace_back(mushroomTexture, sf::IntRect(0,0,8,8), sf::Vector2i(x, y), 4, false);
+            }
+        }
         
         
     }
@@ -68,7 +72,7 @@
 
 
 
-
+/*
 Game::Game(sf::RenderWindow &win, ScreenManager &screenMngr)
     : window(win)
     , screenManager(screenMngr)
@@ -112,9 +116,8 @@ Game::Game(sf::RenderWindow &win, ScreenManager &screenMngr)
 
     std::cout << "[Game] Game object fully initialized\n";
 }
+*/
 
-Game::~Game() {
-}
 
 /*
 void Game::handleInput(const sf::Event &event) {
@@ -126,14 +129,17 @@ void Game::render() {
     // Black rectangle covering entire screen
     
    
-    window.draw(background);
+    //window.draw(background);
     window.draw(playerShape);
     window.draw(bulletShape);
+    for (auto& b : bullet.bullets)
+        window.draw(b);
     // This will be at the top.
 
     // There will be more to draw, but this will be at the bottom
     // ===== DRAW UI TEXT =====
     // Update and draw score text
+    /*
     scoreText.setString("Score: " + std::to_string(score));
     window.draw(scoreText);
 
@@ -144,6 +150,10 @@ void Game::render() {
     // Update and draw level text
     levelText.setString("Level: " + std::to_string(level));
     window.draw(levelText);
+    */
+   for (const auto& m : mushrooms) {
+    m.draw(window, sf::RenderStates::Default);
+}
 }
 
 /**
@@ -155,24 +165,18 @@ void Game::render() {
  * @return Current GameState (PLAYING, PAUSED, GAME_OVER, etc.)
  */
 GameState Game::getState() const {
-    return currentState;
+    //return currentState;
 }
 
 
 
  
     
-    Game::Game(sf::RenderWindow& win, ScreenManager& sm) : window(win) 
-    {
-        initializeGame();
-    }
-    void Game::handleInput(sf::RectangleShape& playrect, Player* obj)
-    {
-        
-        obj->movePlayer(playrect);
-        obj->playerShoot(playrect,bulletShape,bulletTexture,bullet);
-
-    }
+Game::Game(sf::RenderWindow& win, ScreenManager& sm) : window(win) 
+{
+    initializeGame();
+}
+    
     
     
    
@@ -183,7 +187,7 @@ GameState Game::getState() const {
         void playerShoot(sf::RectangleShape& playerRect,sf::RectangleShape& bulletShape ,sf::Texture& bulletTexture,Bullet &projectile);
         std::vector<sf::RectangleShape> bullets; 
         */
-    
+
 void Game::cleanup() {
 }
 
