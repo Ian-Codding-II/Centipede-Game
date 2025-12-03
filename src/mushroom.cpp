@@ -18,7 +18,7 @@ const int MAXHEALTH = 4;
  * @param pos   Vector2f position
  * @param hp    0 < hp <= 4 Number of hitpoints/health
  */
-Mushroom::Mushroom(sf::Texture& texture, sf::IntRect spriteTexture, sf::Vector2f pos, int hp, bool isSuper) : c_obj(texture, spriteTexture, pos) {
+Mushroom::Mushroom(sf::Texture& texture, sf::IntRect spriteTexture, sf::Vector2f pos, int hp, bool isSuper) : c_obj(texture, spriteTexture, pos, "Mushroom") {
 
     if (isSuper) {
         mShroomState = super;

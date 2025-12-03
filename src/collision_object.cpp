@@ -12,9 +12,10 @@ std::vector<c_obj*> c_obj::objects;
 /**
  * @brief Construct a new c_obj object
  */
-c_obj::c_obj(sf::Texture& texture, sf::IntRect spriteTexture, sf::Vector2f pos) {
+c_obj::c_obj(sf::Texture& texture, sf::IntRect spriteTexture, sf::Vector2f pos, std::string name) {
     mSprite.setTexture(texture);
     mTexture = &texture;
+    mName = name;
 
     sf::Vector2u imageSize(spriteTexture.height, spriteTexture.width);
     mSprite.setOrigin(imageSize.x/2, imageSize.y/2);

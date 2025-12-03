@@ -19,7 +19,7 @@
 enum HoriDirection {left, right};
 enum VertDirection {up, down};
 
-class centipede {
+class centipede: public sf::Drawable {
 public:
     centipede(sf::Texture& Texture) : centipede(Texture, 8, sf::Vector2f(0, 0), sf::Vector2i(1, 1)) {};
     centipede(sf::Texture& Texture, int length, sf::Vector2f position, sf::Vector2i factor);
@@ -30,8 +30,11 @@ public:
     void setPosition(sf::Vector2f position);
 
     void setScale(sf::Vector2i factor);
-    void move(sf::Vector2f position);
+    void move();
     void fall();
+
+    void update(float dt);
+    void draw(sf::RenderTarget& target,sf::RenderStates states) const;
 
 private:
     struct segment {
@@ -46,6 +49,7 @@ private:
     std::vector<segment> mCentipedeVect;
     sf::Vector2f mPosition;
     
+    int mLength;
     int mSpacing;
     
 };

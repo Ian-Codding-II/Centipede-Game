@@ -7,7 +7,7 @@
 
 #include "../includes/animated_object.h"
 
-anim_obj::anim_obj(sf::Texture& texture, sf::IntRect StartFrame, int frames) : c_obj(texture, StartFrame, sf::Vector2f(0, 0)) {
+anim_obj::anim_obj(sf::Texture& texture, sf::IntRect StartFrame, int frames, std::string name) : c_obj(texture, StartFrame, sf::Vector2f(0, 0), name) {
     mSize = sf::Vector2f(StartFrame.getSize().x, StartFrame.getSize().y);
     mPos = sf::Vector2f(StartFrame.getPosition().x, StartFrame.getPosition().y);
     mFrames = frames;
@@ -28,7 +28,7 @@ void anim_obj::update(float deltaTime) {
             frameCount = 0;
         }
 
-        setSpriteRect(sf::IntRect(mSize.x * frameCount, mSize.y, mSize.x, mSize.y));
+        setSpriteRect(sf::IntRect(mSize.x * frameCount, mPos.y, mSize.x, mSize.y));
     }
 }
 
