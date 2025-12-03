@@ -1,5 +1,5 @@
 /**
- * @file    centipede.cpp
+ * @file    Centipede.cpp
  * @author  Balin Becker
  * @brief   Centipede class definitions
  * @date    2025-10-21
@@ -39,7 +39,7 @@ Centipede::Centipede(sf::Texture& Texture, int length, sf::Vector2f position, sf
 }
 
 /**
- * @brief Destroy the centipede::centipede object
+ * @brief Destroy the Centipede::Centipede object
  * 
  */
 Centipede::~Centipede() {
@@ -50,7 +50,11 @@ Centipede::~Centipede() {
 }
 
 /**
+<<<<<<< HEAD
  * @brief Hits the centipede at the located part
+=======
+ * @brief Hits the Centipede at the located part
+>>>>>>> 3df56bc79f854491f76b2bf4c343b94d0134d8bd
  * 
  * @param part 
  */
@@ -76,6 +80,8 @@ void Centipede::hit(const c_obj* part) {
 
 /**
  * @brief Places all centipede segments at position
+=======
+ 
  * 
  * @param position Position to place at
  */
@@ -86,7 +92,7 @@ void Centipede::setPosition(sf::Vector2f position) {
 }
 
 /**
- * @brief Sets scale of centipede
+ * @brief Sets scale of Centipede
  * 
  * @param factor Factor to scale by
  */
@@ -95,6 +101,7 @@ void Centipede::setScale(sf::Vector2i factor) {
         seg->mSprite->setScale(factor);
     }
 }
+
 void Centipede::hit() {
     if (!mCentipedeVect.empty()) {
         segment* tail = mCentipedeVect.back();
@@ -108,7 +115,7 @@ void Centipede::hit() {
 
 
 /**
- * @brief Moves the centipede to the position
+ * @brief Moves the Centipede to the position
  * 
  * @param position Position to move to
  */
@@ -205,7 +212,7 @@ void Centipede::move(float dt, Grid grid) {
 }
 
 /**
- * @brief Causes centipede to fall the ground
+ * @brief Causes Centipede to fall the ground
  */
 void Centipede::fall() {
 

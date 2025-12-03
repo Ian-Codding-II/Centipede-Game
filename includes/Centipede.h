@@ -1,7 +1,7 @@
 /**
- * @file    centipede.h
+ * @file    Centipede.h
  * @author  Ian Codding II, Balin Becker
- * @brief   Create a centipede simulator
+ * @brief   Create a Centipede simulator
  * @date    2025-10-21
  */
 
@@ -37,7 +37,11 @@ public:
     void move(float dt, Grid grid);
     void fall();
     void hit(const c_obj* part);
+<<<<<<< HEAD
     void hit(); // Simple hit
+=======
+
+>>>>>>> 3df56bc79f854491f76b2bf4c343b94d0134d8bd
     void update(float dt);
     void draw(sf::RenderTarget& target,sf::RenderStates states) const;
 

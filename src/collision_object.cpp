@@ -36,6 +36,17 @@ c_obj::c_obj(sf::Texture& texture, sf::IntRect spriteTexture, sf::Vector2f pos, 
     objects.push_back(this);
 }
 
+c_obj::~c_obj() {
+    for (long unsigned int i = 0; i < objects.size(); i++) {
+        if (objects[i] == this) {
+            delete objects[i];
+            objects.erase(objects.begin() + i);
+            objects.shrink_to_fit();
+        }
+    }
+}
+
+
 /**
  * @brief Gets an array of colliding sprites
  * @return Vector of colliding c_obj pointers
@@ -89,16 +100,16 @@ void c_obj::setSpriteRect(sf::IntRect spriteTexture) {
 
 /**
  * @brief Sets sprite scale
- * @param factor Scale factor
  */
 void c_obj::setScale(sf::Vector2i factor) {
     mSprite.setScale(sf::Vector2f(factor.x, factor.y));
 }
 
 /**
- * @brief Draw the object
- * @param target Render target
- * @param states Render states
+ * @brief 
+ * 
+ * @param target 
+ * @param states 
  */
 void c_obj::draw(sf::RenderTarget& target,sf::RenderStates states) const {
     target.draw(mSprite, states);

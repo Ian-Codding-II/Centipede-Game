@@ -30,3 +30,4 @@ sf::Vector2f Grid::GetPosition(sf::Vector2f position) {
     snapY = std::clamp(snapY, mRegion.top + mCellSize, mRegion.top + mRegion.height - mCellSize);
     return sf::Vector2f(snapX, snapY);
 }
+
