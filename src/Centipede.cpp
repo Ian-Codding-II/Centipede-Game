@@ -14,7 +14,7 @@ Centipede::Centipede(sf::Texture& Texture, int length, sf::Vector2f position, sf
     mLength = length;
     mSpacing = 15;
     mPosition = position;
-    mTexture = &Texture;
+    mTexture = Texture;
     
     for (int i = 0; i < length; i++) {
         if (i == 0) {
@@ -67,8 +67,8 @@ void Centipede::hit(const c_obj* part) {
     } else if (targetIndex == mLength - 1) { // End / Tail
         mCentipedeVect.pop_back();
     } else {
-        Centipede* leftCenti = new Centipede(*mTexture, targetIndex, mCentipedeVect[0]->mSprite->getPosition(), sf::Vector2i(2, 2));
-        Centipede* rightCenti = new Centipede(*mTexture, mLength - (targetIndex + 1), mCentipedeVect[mLength - (targetIndex + 1)]->mSprite->getPosition(), sf::Vector2i(2, 2));
+        Centipede* leftCenti = new Centipede(mTexture, targetIndex, mCentipedeVect[0]->mSprite->getPosition(), sf::Vector2i(2, 2));
+        Centipede* rightCenti = new Centipede(mTexture, mLength - (targetIndex + 1), mCentipedeVect[mLength - (targetIndex + 1)]->mSprite->getPosition(), sf::Vector2i(2, 2));
         this->~Centipede();
     }
 }

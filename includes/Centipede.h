@@ -57,7 +57,7 @@ private:
     int mSpacing;
     float elapsedTime = 0.0;
     const float speed = 0.1;
-    sf::Texture* mTexture;
+    sf::Texture mTexture;
     
 };
 
