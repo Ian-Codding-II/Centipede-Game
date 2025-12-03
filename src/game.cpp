@@ -1,49 +1,44 @@
 /**
  * @file game.cpp
  * @author Ian Codding II
- * @brief Implementation of Game class - WITHOUT centipede for now
- * @version 2.1 - Testing player, bullets, and mushrooms only
- * @date 2025-11-26
- *
- * @copyright Copyright (c) 2025
+ * @brief Main game controller - orchestrates all gameplay systems
+ * @version 2.3 - Objects handle own collision and grid management
+ * @date 2025-12-01
  */
 
 #include "../includes/game.h"
 #include "../includes/errorHandler.h"
-#include "../includes/GameGrid.h"
-#include <iostream>
+#include "../includes/grid.h"
 #include <cstdlib>
+#include <iostream>
 
 /**
- * @brief Constructor - initialize the game
+ * @brief Constructor - initialize game systems
+ * @param win Reference to render window
+ * @param screenMngr Reference to ScreenManager
  */
-Game::Game(sf::RenderWindow& win, ScreenManager& screenMngr)
-    : window(win),
-      screenManager(screenMngr),
-      currentState(GameState::PLAYING),
-      isGameOver(false),
-      isPaused(false),
-      score(0),
-      lives(3),
-      level(1),
-      player(nullptr),
-      centipede(nullptr),
-      grid(nullptr),
-      playerTexture(),
-      mushroomTexture(),
-      bulletTexture() {
+Game::Game(sf::RenderWindow &win, ScreenManager &screenMngr)
+    : window(win)
+    , screenManager(screenMngr)
+    , currentState(GameState::PLAYING)
+    , isGameOver(false)
+    , isPaused(false)
+    , score(0)
+    , lives(3)
+    , level(1)
+    , player(nullptr)
+    , centipede(nullptr)
+    , grid(nullptr)
+    , texture() {
 
     std::cout << "[Game] Constructor called" << std::endl;
 
-    // Get font from ScreenManager
-    sf::Font& font = screenManager.getFont();
+    sf::Font &font = screenManager.getFont();
 
-    // Set up background
     background.setSize(sf::Vector2f(window.getSize().x, window.getSize().y));
     background.setPosition(0, 0);
     background.setFillColor(sf::Color::Black);
 
-    // Set up text displays
     scoreText.setFont(font);
     scoreText.setCharacterSize(20);
     scoreText.setFillColor(sf::Color::Green);
@@ -59,121 +54,108 @@ Game::Game(sf::RenderWindow& win, ScreenManager& screenMngr)
     levelText.setFillColor(sf::Color::Green);
     levelText.setPosition(window.getSize().x / 2 - 50, 10);
 
-    // Load textures
     if (!loadTextures()) {
-        logError("Game", "Failed to load some textures");
+        logError("Game", "Failed to load textures");
     }
 
     std::cout << "[Game] Constructor completed" << std::endl;
 }
 
 /**
- * @brief Destructor
+ * @brief Destructor - cleanup resources
  */
 Game::~Game() {
     std::cout << "[Game] Destructor called" << std::endl;
     cleanup();
 }
 
-// ===== INITIALIZATION =====
-
 /**
- * @brief Initialize a new game
+ * @brief Initialize new game session
+ * Gets settings, creates player, generates mushrooms
  */
 void Game::initialize() {
     std::cout << "[Game] initialize() called" << std::endl;
 
-    // Create game grid
+    // Create grid
     if (grid == nullptr) {
-        grid = new GameGrid(1200, 800);
-        std::cout << "[Game] Game grid created (1200x800, 32x32 cells)" << std::endl;
-    } else {
-        // Clear grid if reinitializing
-        delete grid;
-        grid = new GameGrid(1200, 800);
+        grid = new Grid(sf::FloatRect(125, 80, 950, 720), 16);
+        std::cout << "[Game] Grid created (360x360, 16x16 cells)" << std::endl;
     }
 
-    // Get settings from SettingsScreen
-    SettingsScreen* settings = 
-        (SettingsScreen*)screenManager.getScreen(GameState::SETTINGS);
+    SettingsScreen *settings =
+        (SettingsScreen *)screenManager.getScreen(GameState::SETTINGS);
 
     if (settings != nullptr) {
         lives = settings->getLives();
         level = settings->getSpawnLevel();
-
-        std::cout << "[Game] Loaded settings: Lives=" << lives
-                  << ", Level=" << level << std::endl;
+        std::cout << "[Game] Settings: Lives=" << lives << ", Level=" << level << std::endl;
     }
 
-    // Reset score
     score = 0;
     isGameOver = false;
     isPaused = false;
+    currentState = GameState::PLAYING;
 
-    // Create player using Roman's startPlayer function
     player = new sf::RectangleShape();
-    Player::startPlayer(*player, playerTexture);
+    Player::startPlayer(*player, texture);
 
-    // Generate initial mushrooms
+    sf::RectangleShape bullet = sf::RectangleShape();
+    Bullet::startBullet(bullet, texture);
+
     generateMushrooms();
 
-    std::cout << "[Game] Game initialized - ready to play!" << std::endl;
-    std::cout << "[Game] Testing: Player, Bullets, and Mushrooms only (no centipede yet)" << std::endl;
+    std::cout << "[Game] Game ready to play" << std::endl;
 }
 
-// ===== GAME LOOP =====
-
 /**
- * @brief Handle input events
+ * @brief Handle pause/resume input (P or ESC)
+ * @param event SFML event to process
  */
-void Game::handleInput(const sf::Event& event) {
-    if (isGameOver) {
+void Game::handleInput(const sf::Event &event) {
+    if (isGameOver)
         return;
-    }
 
     if (event.type == sf::Event::KeyPressed) {
-        if (event.key.code == sf::Keyboard::P) {
+        if (event.key.code == sf::Keyboard::P || event.key.code == sf::Keyboard::Escape) {
             isPaused = !isPaused;
+
             if (isPaused) {
                 currentState = GameState::PAUSED;
-                std::cout << "[Game] Paused" << std::endl;
+                std::cout << "[Game] PAUSED" << std::endl;
             } else {
                 currentState = GameState::PLAYING;
-                std::cout << "[Game] Resumed" << std::endl;
+                std::cout << "[Game] RESUMED" << std::endl;
             }
         }
     }
 }
 
 /**
- * @brief Update game logic
+ * @brief Update game logic each frame
+ * Only called when state == PLAYING
+ * @param dt Delta time since last frame (seconds)
  */
 void Game::update(float dt) {
-    if (isPaused || isGameOver) {
+    if (isPaused || isGameOver)
         return;
-    }
 
-    // Update player movement using Roman's code
+    // Update player
     if (player) {
-        Player::movePlayer(*player, dt);
+        Player::movePlayer(*player, dt, grid->getRegion());
     }
 
-    // Update bullets - handle shooting and movement
-    // Create a temporary bullet shape for new bullets
+    // Handle bullets
     sf::RectangleShape tempBullet;
     tempBullet.setSize(sf::Vector2f(10.f, 10.f));
-    bulletObj.isShooting(*player, tempBullet, bulletTexture, bulletObj, dt);
-    
-    // Move bullets upward
+    bulletObj.isShooting(*player, tempBullet, texture, bulletObj, dt);
+
     for (int i = static_cast<int>(bulletObj.bullets.size()) - 1; i >= 0; i--) {
         sf::Vector2f bulletPos = bulletObj.bullets[i].getPosition();
-        bulletPos.y -= 500 * dt;  // Move up at 500 pixels/second
+        bulletPos.y -= 500 * dt;
         bulletObj.bullets[i].setPosition(bulletPos);
-        
-        // Remove if off-screen
+
         if (bulletPos.y < 0) {
             bulletObj.bullets.erase(bulletObj.bullets.begin() + i);
-            std::cout << "[Game] Bullet removed (off-screen)" << std::endl;
         }
     }
 
@@ -184,93 +166,72 @@ void Game::update(float dt) {
         }
     }
 
-    // Check collisions (bullets vs mushrooms ONLY for now)
-    handleCollisions();
-
-    // Clean up destroyed mushrooms
-    for (int i = mushrooms.size() - 1; i >= 0; i--) {
-        // Check if mushroom is destroyed by trying to get its state
-        // Since there's no public health getter, we check if it doesn't render anymore
-        // For now, we'll keep all mushrooms - destruction is handled by hit()
-    }
-
-    // Update UI
     updateUI();
-
-    // Check game over condition
     checkGameOver();
 
-    // Debug output
     static int frameCount = 0;
-    if (++frameCount % 60 == 0) {  // Every 60 frames
+    if (++frameCount % 60 == 0) {
         debugPrint();
     }
 }
 
 /**
- * @brief Render all game objects
+ * @brief Render all game objects to window
+ * Order: background, mushrooms, bullets, player, UI text
  */
 void Game::render() {
-    // Draw background
     window.draw(background);
 
-    // Draw mushrooms
     for (auto mushroom : mushrooms) {
         if (mushroom) {
             window.draw(*mushroom);
         }
     }
 
-    // Draw bullets
-    for (auto& bullet : bulletObj.bullets) {
+    for (auto &bullet : bulletObj.bullets) {
         window.draw(bullet);
     }
 
-    // Draw player
     if (player) {
         window.draw(*player);
     }
 
-    // Draw UI text
     window.draw(scoreText);
     window.draw(livesText);
     window.draw(levelText);
 }
 
-// ===== STATE MANAGEMENT =====
-
 /**
  * @brief Get current game state
+ * @return GameState (PLAYING, PAUSED, GAME_OVER, etc)
  */
 GameState Game::getState() const {
     return currentState;
 }
 
 /**
- * @brief Set game state
+ * @brief Set game state with debug logging
+ * @param newState New state to transition to
  */
 void Game::setState(GameState newState) {
     if (newState != currentState) {
         currentState = newState;
-        std::cout << "[Game] State changed to " << static_cast<int>(newState) << std::endl;
+        std::cout << "[Game] State: " << static_cast<int>(newState) << std::endl;
     }
 }
 
-// ===== CLEANUP =====
-
 /**
- * @brief Clean up all resources
+ * @brief Clean up all allocated resources
+ * Deletes player, mushrooms, bullets
  */
 void Game::cleanup() {
     std::cout << "[Game] cleanup() called" << std::endl;
 
-    // Delete player
     if (player != nullptr) {
         delete player;
         player = nullptr;
     }
 
-    // Clear mushrooms
     for (auto mushroom : mushrooms) {
         if (mushroom != nullptr) {
             delete mushroom;
@@ -278,10 +239,8 @@ void Game::cleanup() {
     }
     mushrooms.clear();
 
-    // Clear bullets
     bulletObj.bullets.clear();
 
-    // Delete grid
     if (grid != nullptr) {
         delete grid;
         grid = nullptr;
@@ -290,59 +249,47 @@ void Game::cleanup() {
     std::cout << "[Game] Cleanup completed" << std::endl;
 }
 
-// ===== PRIVATE HELPER FUNCTIONS =====
-
 /**
- * @brief Load all textures from atlas
+ * @brief Load all game textures from atlas file
+ * @return true if successful, false on error
  */
 bool Game::loadTextures() {
-    // Load single atlas texture
-    if (!playerTexture.loadFromFile("assets/sprites/atlas.png")) {
-        logError("Game", "Failed to load player texture");
+    if (!texture.loadFromFile("assets/sprites/atlas.png")) {
+        logError("Game", "Failed to load atlas texture");
         return false;
     }
 
-    // All textures point to same atlas
-    mushroomTexture = playerTexture;
-    bulletTexture = playerTexture;
-
-    std::cout << "[Game] All textures loaded successfully" << std::endl;
+    std::cout << "[Game] Atlas loaded" << std::endl;
     return true;
 }
 
 /**
- * @brief Generate mushroom obstacles using grid
+ * @brief Generate random mushroom obstacles
+ * Count = 10 + (level * 2)
  */
 void Game::generateMushrooms() {
     if (grid == nullptr) {
-        std::cerr << "[Game] ERROR: Grid not initialized for mushroom generation!" << std::endl;
+        std::cerr << "[Game] ERROR: Grid not initialized!" << std::endl;
         return;
     }
 
     int mushroomCount = 10 + (level * 2);
 
-    std::cout << "[Game] Generating " << mushroomCount << " mushrooms..." << std::endl;
+    std::cout << "[Game] Generating " << mushroomCount << " mushrooms" << std::endl;
 
     for (int i = 0; i < mushroomCount; i++) {
-        // Get random empty cell from grid
-        auto [gridX, gridY] = grid->getRandomEmptyCell();
+        // Use grid bounds with padding from top for UI
+        float randomX = rand() % (int)grid->getRegion().width + grid->getRegion().left;
+        float randomY = rand() % (int)(grid->getRegion().height - 250) + grid->getRegion().top + 50;
 
-        // Convert grid coordinates to pixel coordinates (center of cell)
-        sf::Vector2f pixelPos = grid->gridToCenterPixel(gridX, gridY);
+        Mushroom *mushroom = new Mushroom(
+            texture,
+            sf::IntRect(64, 64, 32, 32),
+            sf::Vector2f(randomX, randomY),
+            4,
+            false);
 
-        // Create mushroom using Balin's class
-        // Mushroom(texture, spriteTexture, position, health, isSuper)
-        Mushroom* mushroom = new Mushroom(
-            mushroomTexture,
-            sf::IntRect(64, 64, 32, 32),  // Mushroom sprite in atlas - ADJUST IF NEEDED
-            sf::Vector2i(static_cast<int>(pixelPos.x), static_cast<int>(pixelPos.y)),
-            4,      // Health (4 hits to destroy)
-            false   // Not super
-        );
-        
-        // Mark mushroom location on grid
-        grid->setOccupied(gridX, gridY, MUSHROOM);
-        
+        mushroom->setScale(sf::Vector2i(3, 3));
         mushrooms.push_back(mushroom);
     }
 
@@ -350,82 +297,57 @@ void Game::generateMushrooms() {
 }
 
 /**
- * @brief Handle all collisions
- * 
- * Currently tests: Bullets vs Mushrooms only
- * Uses public API for Balin's Mushroom class
+ * @brief Check game over condition and handle top 10 scores
+ * If lives <= 0: set game over and mark for name input if top 10
  */
-void Game::handleCollisions() {
-    if (!player || !grid) return;
+void Game::checkGameOver() {
+    if (lives <= 0) {
+        isGameOver = true;
+        currentState = GameState::GAME_OVER;
 
-    // ===== CHECK BULLET vs MUSHROOM COLLISIONS =====
-    for (int b = static_cast<int>(bulletObj.bullets.size()) - 1; b >= 0; b--) {
-        sf::FloatRect bulletBounds = bulletObj.bullets[b].getGlobalBounds();
+        std::cout << "[Game] GAME OVER - Score: " << score << std::endl;
 
-        for (int m = 0; m < static_cast<int>(mushrooms.size()); m++) {
-            // Get mushroom position using public getPosition()
-            sf::Vector2i mushroomPos = mushrooms[m]->getPosition();
-            
-            // Estimate mushroom bounds (32x32 sprite, origin at center)
-            sf::FloatRect mushroomBounds(mushroomPos.x - 16, mushroomPos.y - 16, 32, 32);
+        GameOverScreen *gameOverScreen =
+            (GameOverScreen *)screenManager.getScreen(GameState::GAME_OVER);
 
-            if (bulletBounds.intersects(mushroomBounds)) {
-                // Hit mushroom!
-                std::cout << "[Game] Bullet hit mushroom!" << std::endl;
-                
-                bulletObj.bullets.erase(bulletObj.bullets.begin() + b);
-                mushrooms[m]->hit(1);  // Damage mushroom by 1 HP
-                score += 5;
+        if (gameOverScreen != nullptr) {
+            gameOverScreen->setScore(score);
 
-                // Clear mushroom from grid
-                int mushX = grid->pixelToGridX(mushroomPos.x);
-                int mushY = grid->pixelToGridY(mushroomPos.y);
-                grid->clearOccupied(mushX, mushY, MUSHROOM);
+            LeaderboardScreen *leaderboard =
+                (LeaderboardScreen *)screenManager.getScreen(GameState::LEADERBOARD);
 
-                std::cout << "[Game] Score: " << score << std::endl;
-                return;  // Exit to avoid checking more after erasing
+            if (leaderboard != nullptr && leaderboard->isTopScore(score)) {
+                std::cout << "[Game] Top 10 score! Ready for name input" << std::endl;
+                gameOverScreen->setIsTopScore(true);
             }
         }
     }
 }
 
 /**
- * @brief Check if game is over
+ * @brief Save name to leaderboard after submission
+ * Called by main.cpp after GameOverScreen returns GAME_OVER
+ * @param playerName Name to save
  */
-void Game::checkGameOver() {
-    // For now, game ends if lives <= 0
-    // TODO: Add centipede collision check later
-    
-    if (lives <= 0) {
-        isGameOver = true;
-        currentState = GameState::GAME_OVER;
-        std::cout << "[Game] GAME OVER! Final score: " << score << std::endl;
+void Game::savePlayerScore(const std::string &playerName) {
+    LeaderboardScreen *leaderboard =
+        (LeaderboardScreen *)screenManager.getScreen(GameState::LEADERBOARD);
+
+    if (leaderboard != nullptr) {
+        leaderboard->addScore(playerName, score);
+        leaderboard->saveToFile();
+        std::cout << "[Game] Score saved: " << playerName << " - " << score << std::endl;
     }
 }
 
-/**
- * @brief Update UI text displays
- */
 void Game::updateUI() {
     scoreText.setString("Score: " + std::to_string(score));
     livesText.setString("Lives: " + std::to_string(lives));
     levelText.setString("Level: " + std::to_string(level));
 }
 
-/**
- * @brief Debug print
- */
 void Game::debugPrint() const {
-    std::cout << "\n[Game] === DEBUG INFO ===" << std::endl;
-    std::cout << "  Score: " << score << std::endl;
-    std::cout << "  Lives: " << lives << std::endl;
-    std::cout << "  Level: " << level << std::endl;
-    std::cout << "  Bullets: " << bulletObj.bullets.size() << std::endl;
-    std::cout << "  Mushrooms: " << mushrooms.size() << std::endl;
-    
-    if (player) {
-        std::cout << "  Player pos: (" << player->getPosition().x << ", " 
-                  << player->getPosition().y << ")" << std::endl;
-    }
-    std::cout << std::endl;
+    std::cout << "[Game] Score: " << score << " | Lives: " << lives
+              << " | Level: " << level << " | Bullets: " << bulletObj.bullets.size()
+              << " | Mushrooms: " << mushrooms.size() << std::endl;
 }

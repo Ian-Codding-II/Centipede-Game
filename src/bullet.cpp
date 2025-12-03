@@ -150,20 +150,21 @@
 //     target.draw(sprite, states);
 // }
 
-void Bullet::startBullet(sf::RectangleShape &bulletObj, sf::Texture &bulletTexture) {
+void Bullet::startBullet(sf::RectangleShape &bulletObj, sf::Texture &atlasTexture) {
     bulletObj.setSize(sf::Vector2f(10.f, 10.f));
     bulletObj.setOutlineColor(sf::Color::Black);
-    bulletObj.setPosition(10.f, 20.f);
+    bulletObj.setOutlineThickness(0.f);
 
-    if (!bulletTexture.loadFromFile("/home/roman/CS151/Final/assets/purpleLaser.png")) {
-        std::cerr << "There was an issue loading the player texture...\n";
-    } else {
-        std::cout << "Bullet texture loaded successfully." << '\n';
-        bulletObj.setTexture(&bulletTexture);
-    }
-    bulletObj.setOutlineThickness(5.f);
-    bulletObj.setPosition(10.f, 20.f);
+    // Use atlas texture (already loaded in Game::loadTextures)
+    bulletObj.setTexture(&atlasTexture);
+
+    // Pick the bullet sprite from the atlas
+    bulletObj.setTextureRect(sf::IntRect(8 * 12, 8 * 1, 8, 8));
+
+    // Start off-screen or default location
+    bulletObj.setPosition(100.f, 100.f);
 }
+
 
 int Bullet::isShooting(sf::RectangleShape &playerRect, sf::RectangleShape &bulletShape, sf::Texture &bulletTexture, Bullet &projectile, float deltaTime) {
 

@@ -14,35 +14,20 @@
 
 #include "animated_object.h"
 #include <vector>
+#include <cmath>
 
-/**
- * @class Centipede
- * @brief Main enemy class - a chain of segments that moves across the screen
- *
- * Responsibilities:
- * - Store all segments in order (head to tail)
- * - Move segments each frame (following grid system)
- * - Handle collision with walls/mushrooms
- * - Handle being shot and splitting
- * - Draw all segments to screen
- *
- * Example usage:
- * ```cpp
- * GameGrid grid(1200, 800);
- * Centipede centipede(&grid, texture, 10);  // 10 segments starting at top
- *
- * // Each frame:
- * centipede.update(dt);  // Move centipede
- * centipede.render(window);  // Draw it
- *
-**/
 class Centipede {
 public:
-    Centipede(sf::Texture& Texture) : Centipede(Texture, 8, sf::Vector2i(1, 1)) {};
-    Centipede(sf::Texture& Texture, int length, sf::Vector2i factor);
+    Centipede(sf::Texture& Texture) : Centipede(Texture, 8, sf::Vector2f(0, 0), sf::Vector2i(1, 1)) {};
+    Centipede(sf::Texture& Texture, int length, sf::Vector2f position, sf::Vector2i factor);
+
+    // Returns head position
+    sf::Vector2f getPosition() {return mPosition;};
+
+    void setPosition(sf::Vector2f position);
 
     void setScale(sf::Vector2i factor);
-    void move(sf::Vector2i position);
+    void move(sf::Vector2f position);
     void fall();
 
 private:
@@ -56,6 +41,7 @@ private:
     };
 
     std::vector<segment> mCentipedeVect;
+    sf::Vector2f mPosition;
     int mSpacing;
     
 };

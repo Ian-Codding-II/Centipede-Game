@@ -12,15 +12,16 @@ std::vector<c_obj*> c_obj::objects;
 /**
  * @brief Construct a new c_obj object
  */
-c_obj::c_obj(sf::Texture& texture, sf::IntRect spriteTexture, sf::Vector2i pos) {
+c_obj::c_obj(sf::Texture& texture, sf::IntRect spriteTexture, sf::Vector2f pos) {
     mSprite.setTexture(texture);
     mTexture = &texture;
 
-    sf::Vector2u imageSize(spriteTexture.height, spriteTexture.width);
+    sf::Vector2u imageSize(spriteTexture.height, spriteTexture.width); // Are these soposed to be swaped?
     mSprite.setOrigin(imageSize.x/2, imageSize.y/2);
     mSprite.setTextureRect(spriteTexture);
 
     mSprite.setPosition(pos.x, pos.y);
+    mPosition = pos;
 
     objects.push_back(this);
 }
@@ -48,8 +49,9 @@ std::vector<c_obj*> c_obj::getCollided() {
  * 
  * @param pos Vector2i (x,y)
  */
-void c_obj::setPosition(sf::Vector2i pos) {
+void c_obj::setPosition(sf::Vector2f pos) {
     mSprite.setPosition(pos.x, pos.y);
+    mPosition = pos;
 }
 
 /**

@@ -7,26 +7,41 @@
 
 #include "../includes/Centipede.h"
 
-Centipede::Centipede(sf::Texture& Texture, int length, sf::Vector2i factor) {
+Centipede::Centipede(sf::Texture& Texture, int length, sf::Vector2f position, sf::Vector2i factor) {
+    mPosition = position;
     for (int i = 0; i < length; i++) {
         if (i == length - 1) {
             // Create a head
             anim_obj headSeg(Texture, sf::IntRect(0, 8*1, 8, 8), 4);
             segment head(headSeg, "Head");
             head.mSprite->setScale(factor);
+            head.mSprite->setPosition(mPosition);
             mCentipedeVect.push_back(head);
         } else {
             // Create a segment
             anim_obj sSegment(Texture, sf::IntRect(0, 0, 8, 8), 4);
             segment seg(sSegment, "Segment");
             seg.mSprite->setScale(factor);
+            seg.mSprite->setPosition(mPosition);
             mCentipedeVect.push_back(seg);
         }
+    }
+
+}
+
+/**
+ * @brief Places all Centipede segments at position
+ * 
+ * @param position Position to place at
+ */
+void Centipede::setPosition(sf::Vector2f position) {
+    for (segment seg : mCentipedeVect) {
+        seg.mSprite->setPosition(position);
     }
 }
 
 /**
- * @brief Sets scale of centipede
+ * @brief Sets scale of Centipede
  * 
  * @param factor Factor to scale by
  */
@@ -37,18 +52,23 @@ void Centipede::setScale(sf::Vector2i factor) {
 }
 
 /**
- * @brief Moves the centipede to the position
+ * @brief Moves the Centipede to the position
  * 
  * @param position Position to move to
  */
-void Centipede::move(sf::Vector2i position) {
-    // Move head toward position once
-    // If segment behind is able to move, move
-    // repeat until head is on position and all segments are in line
+void Centipede::move(sf::Vector2f position) {
+    segment* Head = &mCentipedeVect.back();
+    float distance = sqrt(pow(abs(position.x - mPosition.x), 2) - pow(abs(position.y - mPosition.y), 2));
+    for (int i = 0; i < distance; i++) {
+
+        if (Head->mSprite->getPosition() == position) {
+            // Catch up rest of Centipede
+        }
+    }
 }
 
 /**
- * @brief Causes centipede to fall the ground
+ * @brief Causes Centipede to fall the ground
  */
 void Centipede::fall() {
 

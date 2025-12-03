@@ -12,6 +12,7 @@
 #include "../includes/game.h"
 #include "../includes/Game_State.h"
 #include "../includes/ScreenManager.h"
+#include <cstddef>
 #include <iostream>
 #include <SFML/Graphics.hpp>
 #include <SFML/System/Clock.hpp>
@@ -56,6 +57,7 @@
  */
 int main() {
     try {
+        srand(time(NULL));
         std::cout << "========================================" << std::endl;
         std::cout << "     CENTIPEDE GAME - Starting" << std::endl;
         std::cout << "========================================" << std::endl;

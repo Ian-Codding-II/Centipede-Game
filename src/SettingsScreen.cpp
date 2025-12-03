@@ -158,7 +158,7 @@ void SettingsScreen::initialize() {
     // For now, we'll just note where this should be loaded
     
     // Try to load player texture
-    if (!playerTexture.loadFromFile("assets/sprites/player.png")) {
+    if (!playerTexture.loadFromFile("assets/sprites/atlas.png")) {
         logError("SettingsScreen", "Failed to load player sprite texture");
         std::cout << "[SettingsScreen] Player sprites will not display" << std::endl;
     } else {

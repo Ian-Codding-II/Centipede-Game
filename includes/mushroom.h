@@ -13,25 +13,23 @@
 #ifndef MUSHROOM_H
 #define MUSHROOM_H
 
-#include "collision_object.h"
 #include <SFML/Graphics.hpp>
-#include <SFML/Graphics/Drawable.hpp>
+#include "collision_object.h"
 
-// int MaxX = 100, MaxY = 100, MinX = 100, MinY = 100;
+//int MaxX = 100, MaxY = 100, MinX = 100, MinY = 100;
 extern const int MAXHEALTH;
 
-enum state { normal,
-             super,
-             destroy };
+enum state {normal, super, destroy};
 
-class Mushroom : public c_obj {
-    // Texture
-    // Sprite
-    // Position
-    // Health
-    // Draw
-  public:
-    Mushroom(sf::Texture &texture, sf::IntRect spriteTexture = sf::IntRect(0, 0, 8, 8), sf::Vector2i pos = sf::Vector2i(0, 0), int hp = MAXHEALTH, bool isSuper = false);
+class Mushroom : public c_obj{
+    //Texture
+    //Sprite
+    //Position
+    //Health
+    //Draw
+public:
+
+    Mushroom(sf::Texture& texture, sf::IntRect spriteTexture = sf::IntRect(0, 0, 8, 8), sf::Vector2f pos = sf::Vector2f(0, 0), int hp = MAXHEALTH, bool isSuper = false);
 
     // Default destructor;
     ~Mushroom() {};
@@ -41,12 +39,13 @@ class Mushroom : public c_obj {
 
     void update();
 
-  private:
+private:
     void updateTexture();
     // void updateLvl();
 
     sf::Uint32 mShroomState;
     int mHealth; // When hp == 0, destroy
+    
 };
 
 #endif
