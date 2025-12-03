@@ -23,6 +23,8 @@ int main() {
     }
 
     Grid grid(sf::FloatRect(160, 0, 360, 360), 16);
+    Mushroom newMush(atlas, sf::IntRect(8*8, 8*2, 8, 8), grid.GetPosition(sf::Vector2f(400, 200)));
+    Mushroom newMush2(atlas, sf::IntRect(8*8, 8*2, 8, 8), grid.GetPosition(sf::Vector2f(200, 216)));
     centipede newCenti(atlas, 8, grid.GetPosition(sf::Vector2f(200, 200)), sf::Vector2i(2, 2));
 
     sf::Clock clock;
@@ -41,8 +43,14 @@ int main() {
             
         window.clear(sf::Color::Black);
         // Game rendering will go here
-        newCenti.update(clock.restart().asSeconds());
-        newCenti.move();
+        newMush.setScale(sf::Vector2i(2, 2));
+        newMush2.setScale(sf::Vector2i(2, 2));
+        float tick = clock.restart().asSeconds();
+        newCenti.move(tick);
+        newCenti.update(tick);
+
+        window.draw(newMush);
+        window.draw(newMush2);
         window.draw(newCenti);
         // std::cout << newMushroom.getPosition().x << ' ' << newMushroom.getPosition().y << std::endl;
         window.display();

@@ -16,8 +16,8 @@
 #include <vector>
 #include <cmath>
 
-enum HoriDirection {left, right};
-enum VertDirection {up, down};
+enum class HoriDirection {left, right};
+enum class VertDirection {up, down};
 
 class centipede: public sf::Drawable {
 public:
@@ -30,7 +30,7 @@ public:
     void setPosition(sf::Vector2f position);
 
     void setScale(sf::Vector2i factor);
-    void move();
+    void move(float dt);
     void fall();
 
     void update(float dt);
@@ -38,19 +38,21 @@ public:
 
 private:
     struct segment {
-        segment(anim_obj& sprite, std::string name) {
+        segment(anim_obj* sprite, std::string name) {
             mName = name;
-            mSprite = &sprite;
+            mSprite = sprite;
         }
         anim_obj* mSprite;
         std::string mName;
     };
 
-    std::vector<segment> mCentipedeVect;
+    std::vector<segment*> mCentipedeVect;
     sf::Vector2f mPosition;
     
     int mLength;
     int mSpacing;
+    float elapsedTime = 0.0;
+    const float speed = 0.1;
     
 };
 

@@ -18,6 +18,7 @@ class c_obj : public sf::Drawable {
         c_obj(sf::Texture& texture, sf::IntRect spriteTexture, sf::Vector2f pos, std::string name);
 
         std::vector<c_obj*> getCollided();
+        std::vector<c_obj*> getCollided(sf::FloatRect region);
 
         void setPosition(sf::Vector2f pos);
         void setSpriteRect(sf::IntRect spriteTexture);
