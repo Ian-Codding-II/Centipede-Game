@@ -158,18 +158,19 @@ void Game::update(float dt) {
             std::cout << "[Game] Bullet removed (off-screen)\n";
         }
     }
+    //std::cout << " NOW!!!!" << '\n';
     for (int i = (int)bulletObj.bullets.size() - 1; i >= 0; i--) {
         Bullet* bullet = bulletObj.bullets[i];
         bullet->update(dt);
-        if (!bullet->isAlive()) {
+        if (!(bullet->isAlive())) {
             sf::Vector2i intPos = bullet->getPosition();
         sf::Vector2f floatPos(static_cast<float>(intPos.x), static_cast<float>(intPos.y));  // safe access
             std::cout << "The x value for the bullet = " << floatPos.x
                 << " and the y value for the bullet = " << floatPos.y << '\n';
-    delete bullet;
-    bulletObj.bullets.erase(bulletObj.bullets.begin() + i);
-    std::cout << "[Game] Bullet removed (off-screen)" << std::endl;
-                    }
+        delete bullet;
+        bulletObj.bullets.erase(bulletObj.bullets.begin() + i);
+        std::cout << "[Game] Bullet removed (off-screen)" << std::endl;
+                        }
     }
     
 
@@ -181,7 +182,7 @@ void Game::update(float dt) {
         }
     }
     
-    // handleCollisions();
+    handleCollisions();
 
     // Update UI
     updateUI();
@@ -285,7 +286,37 @@ void Game::generateMushrooms() {
 }
 
 
-// void Game::handleCollisions() { ... }
+ void Game::handleCollisions() {
+    // BULLET vs MUSHROOM collisions
+    for (int i = (int)Bullet::bullets.size() - 1; i >= 0; i--) {
+        Bullet* b = Bullet::bullets[i];
+        if (!b->isAlive()) continue;
+
+        for (int j = (int)mushrooms.size() - 1; j >= 0; j--) {
+            Mushroom* m = mushrooms[j];
+
+            if (b->mSprite.getGlobalBounds().intersects(m->getBounds())) {
+                b->kill();     // remove bullet
+                m->hit(1);             // reduce mushroom health by 1
+                std::cout << "[Collision] Bullet hit mushroom\n";
+
+                if (m->isDestroyed()) {
+                    delete m;
+                    mushrooms.erase(mushrooms.begin() + j);
+                    std::cout << "[Collision] Mushroom destroyed\n";
+                }
+
+                break;  // bullet hits only one mushroom
+            }
+        }
+
+        if (!b->isAlive()) {
+            delete b;
+            Bullet::bullets.erase(Bullet::bullets.begin() + i);
+        }
+    }
+}
+
 
 void Game::checkGameOver() {
     if (lives <= 0) {

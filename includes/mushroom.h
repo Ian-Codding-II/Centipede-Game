@@ -35,13 +35,18 @@ class Mushroom : public c_obj {
 
     // Default destructor;
     ~Mushroom() {};
-
+    sf::FloatRect getBounds() const {
+        return mSprite.getGlobalBounds();
+    }
     void hit(float dmg);
     void hit(int dmg);
-
+    
+    bool isDestroyed() const;
     void update();
-
-  private:
+    bool isAlive() const { return alive; }
+    void kill() { alive = false; }
+    private:
+    bool alive;
     void updateTexture();
     // void updateLvl();
 

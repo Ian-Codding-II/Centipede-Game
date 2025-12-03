@@ -14,17 +14,18 @@
 
 
 std::vector<Bullet*> Bullet::bullets;
-
+float Bullet::timeSinceLastShot = 0.0f;
+float Bullet::shootCooldown = 0.1f;
 // The actual shoot function
 void Bullet::shoot(sf::Vector2i playerPos, float deltaTime, sf::Texture& bulletTex)
 {
-    //timeSinceLastShot += deltaTime;
+    timeSinceLastShot += deltaTime;
 
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space) && timeSinceLastShot >= shootCooldown)
     {
         // Center bullet on player
         sf::Vector2i bulletStart(
-            playerPos.x + 16,  // assuming player is ~32px wide
+            playerPos.x + 16,  
             playerPos.y
         );
 
@@ -34,6 +35,6 @@ void Bullet::shoot(sf::Vector2i playerPos, float deltaTime, sf::Texture& bulletT
         std::cout << "New bullet created at (" 
                   << bulletStart.x << ", " << bulletStart.y << ")\n";
 
-        //timeSinceLastShot = 0.0f;
+        timeSinceLastShot = 0.0f;
     }
 }

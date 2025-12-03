@@ -23,17 +23,17 @@ public:
 
         velocity = sf::Vector2f(0.0f, -speed);  // MOVE UPWARD
     }
-
+    void kill() { alive = false; }
     void update(float dt)
     {
         if (!alive) return;
 
         mSprite.move(velocity * dt);  // Actually moves now!
 
-        // Remove when off top of screen
+        
         if (mSprite.getPosition().y < -50.0f)
         {
-            alive = true;
+            alive = false;
         }
     }
 
@@ -44,8 +44,8 @@ public:
 
     static std::vector<Bullet*> bullets;
 
-    //float shootCooldown;
-    //static float timeSinceLastShot;
+    static float shootCooldown;
+    static float timeSinceLastShot;
 
 private:
     sf::Vector2f velocity;

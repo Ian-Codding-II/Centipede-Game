@@ -165,6 +165,7 @@ private:
      * @brief Handle all collisions
      */
     void handleCollisions();
+    
 
     /**
      * @brief Check if game is over (lose condition)

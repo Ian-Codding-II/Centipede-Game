@@ -214,6 +214,7 @@ Mushroom::Mushroom(sf::Texture& texture, sf::IntRect spriteTexture, sf::Vector2i
         mHealth = MAXHEALTH;
     
     updateTexture();
+    mSprite.setScale(2,2);
     
 }
 
@@ -300,4 +301,7 @@ void Mushroom::updateTexture() {
 void Mushroom::update() {
     updateTexture();
 }
-
+bool Mushroom::isDestroyed() const
+{
+    return mHealth <= 0;
+}
