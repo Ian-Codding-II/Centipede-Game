@@ -14,6 +14,7 @@ centipede::centipede(sf::Texture& Texture, int length, sf::Vector2f position, sf
     mLength = length;
     mSpacing = 15;
     mPosition = position;
+    mTexture = &Texture;
     
     for (int i = 0; i < length; i++) {
         if (i == 0) {
@@ -36,6 +37,42 @@ centipede::centipede(sf::Texture& Texture, int length, sf::Vector2f position, sf
     vertState = VertDirection::down;
     horiState = HoriDirection::right;
 }
+
+/**
+ * @brief Destroy the centipede::centipede object
+ * 
+ */
+centipede::~centipede() {
+    for (int i = 0; i < mLength; i++) {
+        delete mCentipedeVect[i]->mSprite;
+        delete mCentipedeVect[i];
+    }
+}
+
+/**
+ * @brief Hits the centipede at the located part
+ * 
+ * @param part 
+ */
+void centipede::hit(const c_obj* part) {
+    int targetIndex = 0;
+    for (int i = 0; i < mLength; i++) {
+        if (mCentipedeVect[i]->mSprite == part) {
+            targetIndex = i;
+        }
+    }
+    if (targetIndex == 0) { // Head
+        mCentipedeVect.erase(mCentipedeVect.begin());
+        mCentipedeVect.shrink_to_fit();
+    } else if (targetIndex == mLength - 1) { // End / Tail
+        mCentipedeVect.pop_back();
+    } else {
+        centipede* leftCenti = new centipede(*mTexture, targetIndex, mCentipedeVect[0]->mSprite->getPosition(), sf::Vector2i(2, 2));
+        centipede* rightCenti = new centipede(*mTexture, mLength - (targetIndex + 1), mCentipedeVect[mLength - (targetIndex + 1)]->mSprite->getPosition(), sf::Vector2i(2, 2));
+        this->~centipede();
+    }
+}
+
 
 /**
  * @brief Places all centipede segments at position

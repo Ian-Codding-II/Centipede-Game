@@ -27,6 +27,17 @@ c_obj::c_obj(sf::Texture& texture, sf::IntRect spriteTexture, sf::Vector2f pos, 
     objects.push_back(this);
 }
 
+c_obj::~c_obj() {
+    for (int i = 0; i < objects.size(); i++) {
+        if (objects[i] == this) {
+            delete objects[i];
+            objects.erase(objects.begin() + i);
+            objects.shrink_to_fit();
+        }
+    }
+}
+
+
 /**
  * @brief Gets an array of colliding sprites
  * 
