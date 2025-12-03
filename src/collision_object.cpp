@@ -37,13 +37,12 @@ c_obj::c_obj(sf::Texture& texture, sf::IntRect spriteTexture, sf::Vector2f pos, 
 }
 
 c_obj::~c_obj() {
-    for (long unsigned int i = 0; i < objects.size(); i++) {
-        if (objects[i] == this) {
-            delete objects[i];
-            objects.erase(objects.begin() + i);
-            objects.shrink_to_fit();
-        }
+    auto it = std::find(objects.begin(),objects.end(),this);
+    if(it != objects.end())
+    {
+        objects.erase(it);
     }
+    
 }
 
 

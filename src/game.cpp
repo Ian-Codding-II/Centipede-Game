@@ -98,8 +98,8 @@ void Game::initialize() {
     player = new sf::RectangleShape();
     Player::startPlayer(*player, texture);
 
-    centipede = new Centipede(texture, 5, sf::Vector2f(200, 100), sf::Vector2i(2, 2));
-    std::cout << "[Game] Centipede created" << std::endl;
+    //centipede = new Centipede(texture, 5, sf::Vector2f(200, 100), sf::Vector2i(2, 2));
+    //std::cout << "[Game] Centipede created" << std::endl;
 
     generateMushrooms();
 
@@ -184,6 +184,7 @@ for (int i = (int)Bullet::bullets.size() - 1; i >= 0; i--) {
     }
 
     // Update centipede
+    
     if (centipede) {
         centipede->move(dt, *grid);
         centipede->update(dt);
