@@ -12,14 +12,14 @@
 
 class anim_obj : public c_obj {
 public:
-    anim_obj(sf::Texture& texture, sf::IntRect StartFrame, int frames);
+    anim_obj(sf::Texture& texture, sf::IntRect StartFrame, int frames, std::string name);
     void update(float deltaTime);
 private:
-    sf::Vector2i mPos;
-    sf::Vector2i mSize;
+    sf::Vector2f mPos;
+    sf::Vector2f mSize;
     int mFrames, frameCount = 0;
 
-    const float fps = 0.5;
+    const float fps = 0.15;
     float totalElapsed = 0.0;
 };
 

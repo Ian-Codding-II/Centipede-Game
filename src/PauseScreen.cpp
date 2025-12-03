@@ -2,7 +2,7 @@
  * @file PauseScreen.cpp
  * @author Ian Codding II
  * @brief Implementation of PauseScreen - pause menu during gameplay
- * @version 1.0
+ * @version 1.1 - Fixed state management
  * @date 2025-10-27
  * 
  * @copyright Copyright (c) 2025
@@ -89,16 +89,16 @@ void PauseScreen::initialize() {
     float winHeight = window.getSize().y;
     
     // Button dimensions and spacing
-    float buttonWidth = 200;
-    float buttonHeight = 50;
-    float spacing = 20;
+    float buttonWidth =  winWidth * 0.36f;;
+    float buttonHeight =  winHeight * 0.09f;
+    float spacing = winHeight * 0.07f;
     
     // Center buttons horizontally
-    float centerX = (winWidth - buttonWidth) / 2;
+    float centerX = (winWidth * 0.5f);
     
     // Calculate vertical position to center all buttons
     float totalHeight = (buttonHeight + spacing) * 3; // 3 buttons
-    float startY = (winHeight - totalHeight) / 2;
+    float startY = (winHeight - totalHeight) / 2+100;
     
     // Create RESUME button
     // Constructor: Button(label, position, size, color)
@@ -138,10 +138,10 @@ void PauseScreen::initialize() {
     std::cout << "[PauseScreen] Created Quit button" << std::endl;
     
     // Create quit confirmation dialog buttons (YES and NO)
-    float confirmStartY = startY + 3 * (buttonHeight + spacing) + spacing;
-    float confirmButtonWidth = 80;
-    float confirmSpacing = 40;
-    float confirmCenterX = (winWidth - (confirmButtonWidth * 2 + confirmSpacing)) / 2;
+    float confirmStartY = startY + 3 * (buttonHeight + spacing) + spacing - 190;
+    float confirmButtonWidth = 120;
+    float confirmSpacing = 130;
+    float confirmCenterX = (winWidth - (confirmButtonWidth + confirmSpacing)) / 2;
     
     // YES button - left side
     confirmYesButton = new Button(
@@ -283,8 +283,8 @@ void PauseScreen::render() {
  * Appears on top of everything else.
  */
 void PauseScreen::renderQuitDialog() {
-    float winWidth = window.getSize().x;
-    float winHeight = window.getSize().y;
+    float winWidth = 1200;
+    float winHeight = 800;
     
     // Create and draw darker overlay for the dialog
     sf::RectangleShape dialogOverlay(sf::Vector2f(winWidth, winHeight));
@@ -319,7 +319,7 @@ void PauseScreen::renderQuitDialog() {
     questionText.setFillColor(sf::Color::White);
     questionText.setPosition(
         dialogX + (dialogWidth - questionText.getLocalBounds().width) / 2,
-        dialogY + 30
+        dialogY + 70
     );
     window.draw(questionText);
     
@@ -333,10 +333,10 @@ void PauseScreen::renderQuitDialog() {
 }
 
 /**
- * @brief Cleanup - delete all buttons
+ * @brief Cleanup - delete all buttons and reset state
  * 
  * Called when transitioning away from this screen.
- * Properly deletes all allocated buttons.
+ * Properly deletes all allocated buttons and resets dialog state.
  */
 void PauseScreen::cleanup() {
     std::cout << "[PauseScreen] cleanup() called" << std::endl;
@@ -365,6 +365,9 @@ void PauseScreen::cleanup() {
         delete confirmNoButton;
         confirmNoButton = nullptr;
     }
+    
+    // Reset dialog state
+    showQuitDialog = false;
     
     std::cout << "[PauseScreen] All buttons deleted" << std::endl;
 }

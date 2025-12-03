@@ -7,28 +7,27 @@
 
     #include "../includes/animated_object.h"
 
-    anim_obj::anim_obj(sf::Texture& texture, sf::IntRect StartFrame, int frames) : c_obj(texture, StartFrame, sf::Vector2i(0, 0)) {
-        //mSize = StartFrame.getSize();
-        //mPos = StartFrame.getPosition();
-        mFrames = frames;
+anim_obj::anim_obj(sf::Texture& texture, sf::IntRect StartFrame, int frames, std::string name) : c_obj(texture, StartFrame, sf::Vector2f(0, 0), name) {
+    mSize = sf::Vector2f(StartFrame.getSize().x, StartFrame.getSize().y);
+    mPos = sf::Vector2f(StartFrame.getPosition().x, StartFrame.getPosition().y);
+    mFrames = frames;
 
-    }
+}
 
-    /**
-     * @brief update sprite
-     *          On function call, change to next frame
-     */
-    void anim_obj::update(float deltaTime) {
-        totalElapsed += deltaTime;
+/**
+ * @brief update sprite
+ *          On function call, change to next frame
+ */
+void anim_obj::update(float deltaTime) {
+    totalElapsed += deltaTime;
 
-        if (totalElapsed >= fps) {
-            totalElapsed -= fps;
-            frameCount++;
-            if (frameCount >= mFrames) {
-                frameCount = 0;
-            }
-
-            setSpriteRect(sf::IntRect(mSize.x * frameCount, mSize.y, mSize.x, mSize.y));
+    if (totalElapsed >= fps) {
+        totalElapsed -= fps;
+        frameCount++;
+        if (frameCount >= mFrames) {
+            frameCount = 0;
         }
-    }
 
+        setSpriteRect(sf::IntRect(mSize.x * frameCount, mPos.y, mSize.x, mSize.y));
+    }
+}

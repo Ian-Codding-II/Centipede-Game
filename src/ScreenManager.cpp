@@ -288,7 +288,7 @@ Screen *ScreenManager::getScreen(GameState state) {
 
     case GameState::GAME_OVER:
         // Create a GameOverScreen
-        newScreen = new GameOverScreen(window, font);
+        newScreen = new GameOverScreen(window, font, *this);
         break;
 
     case GameState::LEADERBOARD:

@@ -26,8 +26,7 @@
 class Player {
   public:
     static void startPlayer(sf::RectangleShape &rectangle, sf::Texture &playerTexture);
-    static void movePlayer(sf::RectangleShape &playerRectangle, float deltaTime);
-    bool boundsChecking(int x, int y);
+    static void movePlayer(sf::RectangleShape &playerRectangle, float deltaTime, const sf::FloatRect &gridBounds);
     bool playerShoot(sf::RectangleShape &playerRect, sf::RectangleShape &bulletShape, sf::Texture &bulletTexture, Bullet &projectile);
 
   private:

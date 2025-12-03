@@ -20,18 +20,20 @@ void Player::startPlayer(sf::RectangleShape &rectangle, sf::Texture &playerTextu
 
     // Load player texture
 
-    if (!playerTexture.loadFromFile("/home/roman/CS151/Final/assets/HqCreature.png")) // Absolute path seems to work
-    {
-        std::cerr << "There was an issue loading the player texture...\n";
-    } else {
-        std::cout << "Success loading player texture...\n";
-    }
+    // if (!playerTexture.loadFromFile("/home/roman/CS151/Final/assets/HqCreature.png")) // Absolute path seems to work
+    // {
+    //     std::cerr << "There was an issue loading the player texture...\n";
+    // } else {
+    //     std::cout << "Success loading player texture...\n";
+    // }
 
     // Apply texture to rectangle
     rectangle.setTexture(&playerTexture);
+    rectangle.setTextureRect(sf::IntRect(12 * 8, 0, 8, 8));
+    // player->setScale(sf::Vector2f(3,3));
 }
 
-void Player::movePlayer(sf::RectangleShape &playerRectangle, float deltaTime) {
+void Player::movePlayer(sf::RectangleShape &playerRectangle, float deltaTime, const sf::FloatRect &gridBounds) {
     sf::Vector2f pos = playerRectangle.getPosition();
     float speed = 500.f;
 
@@ -44,11 +46,13 @@ void Player::movePlayer(sf::RectangleShape &playerRectangle, float deltaTime) {
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::S) || sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
         pos.y += speed * deltaTime;
 
-    float left = 0.f;
-    float right = 1200.f - playerRectangle.getSize().x;
-    float top = 600.f;
-    float bottom = 800.f - playerRectangle.getSize().y;
+    // Use grid bounds instead of hard-coded numbers
+    float left = gridBounds.left;
+    float right = gridBounds.left + gridBounds.width - playerRectangle.getSize().x;
+    float top = gridBounds.top + gridBounds.height - 200; // PLAYER AREA
+    float bottom = gridBounds.top + gridBounds.height - playerRectangle.getSize().y;
 
+    // Apply clamping
     if (pos.x < left)
         pos.x = left;
     if (pos.x > right)
@@ -59,13 +63,6 @@ void Player::movePlayer(sf::RectangleShape &playerRectangle, float deltaTime) {
         pos.y = bottom;
 
     playerRectangle.setPosition(pos);
-}
-
-bool Player::boundsChecking(int x, int y) {
-    if (x >= 795 || y <= 405 || x <= 5 || y <= 595) {
-        return 0;
-    }
-    return 1;
 }
 
 // #include "../includes/player.h"

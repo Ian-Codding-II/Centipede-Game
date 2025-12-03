@@ -1,64 +1,70 @@
 /**
  * @file GameOverScreen.cpp
  * @author Ian Codding II
- * @brief Implementation of GameOverScreen - game over screen
- * @version 1.0
- * @date 2025-10-27
- * 
- * @copyright Copyright (c) 2025
+ * @brief Game over screen with name input for top 10 scores
+ * @version 1.2 - Fixed state management
+ * @date 2025-12-01
  */
 
 #include "../includes/GameOverScreen.h"
-#include "../includes/errorHandler.h"
+// #include "../includes/errorHandler.h"
+#include "../includes/LeaderboardScreen.h"
 #include <iostream>
 #include <string>
 
 /**
- * @brief Constructor - initialize the game over screen
- * 
- * Sets up:
- * - All button pointers to nullptr
- * - finalScore to 0 (will be set by setScore() before display)
- * - Black background
- * - "GAME OVER" title text (red)
- * - Score display text
- * 
- * @param win Reference to the main window
- * @param fnt Reference to the shared font
+ * @brief Constructor - setup game over screen
+ * @param win Reference to render window
+ * @param fnt Reference to font
  */
-GameOverScreen::GameOverScreen(sf::RenderWindow& win, sf::Font& fnt)
-    : Screen(win, fnt),
-      playAgainButton(nullptr),
-      mainMenuButton(nullptr),
-      finalScore(0) {
-    
+GameOverScreen::GameOverScreen(sf::RenderWindow &win, sf::Font &fnt, ScreenManager &manager)
+    : Screen(win, fnt)
+    , screenManager(manager)
+    , playAgainButton(nullptr)
+    , mainMenuButton(nullptr)
+    , submitButton(nullptr)
+    , finalScore(0)
+    , isTopScore(false)
+    , playerName("") {
+
     std::cout << "[GameOverScreen] Constructor called" << std::endl;
-    
-    // Set up the black background
+
     background.setSize(sf::Vector2f(window.getSize().x, window.getSize().y));
     background.setPosition(0, 0);
     background.setFillColor(sf::Color::Black);
-    
-    // Set up the "GAME OVER" title
-    // Red text to indicate failure/end
+
     gameOverText.setFont(font);
     gameOverText.setString("GAME OVER");
     gameOverText.setCharacterSize(80);
     gameOverText.setFillColor(sf::Color::Red);
     gameOverText.setPosition(
         (window.getSize().x - gameOverText.getLocalBounds().width) / 2,
-        50
-    );
-    
-    // Set up the score display text
+        50);
+
     scoreText.setFont(font);
     scoreText.setCharacterSize(40);
     scoreText.setFillColor(sf::Color::Yellow);
-    // Position will be updated when score is set
+
+    namePromptText.setFont(font);
+    namePromptText.setString("Enter your name for leaderboard (max 16 chars):");
+    namePromptText.setCharacterSize(24);
+    namePromptText.setFillColor(sf::Color::Green);
+    namePromptText.setPosition(50, 280);
+
+    nameInputBox.setSize(sf::Vector2f(520, 60));
+    nameInputBox.setPosition(350, 330);
+    nameInputBox.setFillColor(sf::Color(50, 50, 50));
+    nameInputBox.setOutlineThickness(2);
+    nameInputBox.setOutlineColor(sf::Color::Green);
+
+    nameDisplayText.setFont(font);
+    nameDisplayText.setCharacterSize(30);
+    nameDisplayText.setFillColor(sf::Color::White);
+    nameDisplayText.setPosition(370, 340);
 }
 
 /**
- * @brief Destructor - clean up resources
+ * @brief Destructor - cleanup buttons
  */
 GameOverScreen::~GameOverScreen() {
     std::cout << "[GameOverScreen] Destructor called" << std::endl;
@@ -66,175 +72,208 @@ GameOverScreen::~GameOverScreen() {
 }
 
 /**
- * @brief Set the final score to display
- * 
- * Updates the finalScore variable and refreshes the score display text.
- * This should be called by the Game class when transitioning to game over.
- * 
- * Example in Game class:
- * ```cpp
- * GameOverScreen* gameOverScreen = (GameOverScreen*)screenManager.getScreen(GameState::GAME_OVER);
- * gameOverScreen->setScore(currentScore);
- * screenManager.setState(GameState::GAME_OVER);
- * ```
- * 
- * @param score The final score to display
+ * @brief Set final score to display
+ * @param score Final score achieved
  */
 void GameOverScreen::setScore(int score) {
     finalScore = score;
-    
-    // Create the score display string
-    // Example: "Final Score: 12500"
     scoreText.setString("Final Score: " + std::to_string(score));
-    
-    // Center the score text horizontally
     scoreText.setPosition(
         (window.getSize().x - scoreText.getLocalBounds().width) / 2,
-        200
-    );
-    
+        200);
     std::cout << "[GameOverScreen] Score set to " << score << std::endl;
 }
 
 /**
- * @brief Initialize - create all buttons for this screen
- * 
- * Creates 2 buttons:
- * - Play Again button (to start a new game)
- * - Main Menu button (to return to menu)
- * 
- * Button constructor signature:
- * Button(std::string label, sf::Vector2f position, sf::Vector2f size, sf::Color color)
- * 
- * Buttons are positioned below the score display.
+ * @brief Mark if score qualifies for top 10
+ * Shows name input box if true
+ * @param topScore true if top 10 score
+ */
+void GameOverScreen::setIsTopScore(bool topScore) {
+    isTopScore = topScore;
+    playerName = "";
+    nameDisplayText.setString("");
+    std::cout << "[GameOverScreen] isTopScore = " << topScore << std::endl;
+}
+
+/**
+ * @brief Get the player name entered
+ * @return The player's name
+ */
+std::string GameOverScreen::getPlayerName() const {
+    return playerName;
+}
+
+/**
+ * @brief Reset the screen for next game
+ * Clears buttons and state
+ */
+void GameOverScreen::reset() {
+    isTopScore = false;
+    playerName = "";
+    nameDisplayText.setString("");
+    cleanup();
+}
+
+/**
+ * @brief Initialize buttons
+ * Shows name input only if isTopScore is true
  */
 void GameOverScreen::initialize() {
     std::cout << "[GameOverScreen] initialize() called" << std::endl;
-    
+
     float winWidth = window.getSize().x;
-    float winHeight = window.getSize().y;
-    
-    // Button dimensions
-    float buttonWidth = 200;
+
+    float buttonWidth = 300;
     float buttonHeight = 50;
-    float spacing = 20;
-    
-    // Center buttons horizontally
-    float centerX = (winWidth - buttonWidth) / 2;
-    
-    // Calculate vertical position (below score)
-    float startY = 300;
-    
-    // Create PLAY AGAIN button
-    // This restarts the game
+    float spacing = 40;
+    float centerX = (winWidth) / 2;
+
+    float startY = isTopScore ? 600 : 400;
+
     playAgainButton = new Button(
         "Play Again",
         sf::Vector2f(centerX, startY),
         sf::Vector2f(buttonWidth, buttonHeight),
-        sf::Color::Green
-    );
+        sf::Color::Green);
     playAgainButton->setColorTextNormal(sf::Color::Black);
     playAgainButton->setColorTextHover(sf::Color::Yellow);
-    std::cout << "[GameOverScreen] Created Play Again button" << std::endl;
-    
-    // Create MAIN MENU button
-    // This returns to the main menu
+
     mainMenuButton = new Button(
         "Main Menu",
         sf::Vector2f(centerX, startY + (buttonHeight + spacing)),
         sf::Vector2f(buttonWidth, buttonHeight),
-        sf::Color::Yellow
-    );
+        sf::Color::Yellow);
     mainMenuButton->setColorTextNormal(sf::Color::Black);
     mainMenuButton->setColorTextHover(sf::Color::Green);
-    std::cout << "[GameOverScreen] Created Main Menu button" << std::endl;
+
+    if (isTopScore) {
+        submitButton = new Button(
+            "Submit",
+            sf::Vector2f(centerX, 500),
+            sf::Vector2f(buttonWidth, buttonHeight),
+            sf::Color::Cyan);
+        submitButton->setColorTextNormal(sf::Color::Black);
+        submitButton->setColorTextHover(sf::Color::Yellow);
+    }
 }
 
 /**
- * @brief Update - process events and return next state
- * 
- * Updates all buttons and handles clicks.
- * 
- * Note: Button::update() takes (sf::Event&, sf::RenderWindow&)
- * Note: Button::getState() returns: normal, hovered, or clicked
- * 
- * Return states:
- * - PLAYING: Play Again clicked - start new game
- * - MENU: Main Menu clicked - return to menu
- * - GAME_OVER: No button clicked - stay on game over screen
- * 
- * @param event The SFML event to process
+ * @brief Update event handling
+ * Handles name input (if top score) and button clicks
+ * @param event SFML event to process
  * @return Next state to transition to
  */
-GameState GameOverScreen::update(sf::Event& event) {
-    // Update PLAY AGAIN button
+GameState GameOverScreen::update(sf::Event &event) {
+    // Name input handling
+    if (isTopScore && event.type == sf::Event::TextEntered) {
+        if (event.text.unicode < 128) {
+            char c = static_cast<char>(event.text.unicode);
+
+            if (c == '\b') {
+                if (!playerName.empty()) {
+                    playerName.pop_back();
+                }
+            } else if (c >= 32 && playerName.length() < 16) {
+                playerName += c;
+            }
+
+            nameDisplayText.setString(playerName);
+        }
+    }
+
+    // Submit button handling (only if top score and name entered)
+    if (submitButton && isTopScore) {
+        submitButton->update(event, window);
+        if (submitButton->getState() == clicked && !playerName.empty()) {
+            std::cout << "[GameOverScreen] Name submitted: " << playerName << std::endl;
+
+            // Save score to leaderboard
+            LeaderboardScreen *leaderboard =
+                dynamic_cast<LeaderboardScreen *>(screenManager.getScreen(GameState::LEADERBOARD));
+
+            if (leaderboard != nullptr) {
+                // IMPORTANT — ensure leaderboard is initialized
+                leaderboard->initialize();
+
+                leaderboard->addScore(playerName, finalScore);
+                leaderboard->saveToFile();
+                std::cout << "[GameOverScreen] Score saved to leaderboard" << std::endl;
+            }
+
+            // Reset name input state
+            isTopScore = false;
+            playerName = "";
+            nameDisplayText.setString("");
+
+            // Stay on game over screen until Play Again or Main Menu is clicked
+        }
+    }
+
+    // Play Again button handling
     if (playAgainButton != nullptr) {
         playAgainButton->update(event, window);
         if (playAgainButton->getState() == clicked) {
-            std::cout << "[GameOverScreen] Play Again clicked - starting new game" << std::endl;
+            std::cout << "[GameOverScreen] Play Again clicked" << std::endl;
             return GameState::PLAYING;
         }
     }
-    
-    // Update MAIN MENU button
+
+    // Main Menu button handling
     if (mainMenuButton != nullptr) {
         mainMenuButton->update(event, window);
         if (mainMenuButton->getState() == clicked) {
-            std::cout << "[GameOverScreen] Main Menu clicked - returning to menu" << std::endl;
+            std::cout << "[GameOverScreen] Main Menu clicked" << std::endl;
             return GameState::MENU;
         }
     }
-    
-    // No button clicked, stay on game over screen
+
     return GameState::GAME_OVER;
 }
 
 /**
- * @brief Render - draw the game over screen
- * 
- * Drawing order:
- * 1. Black background
- * 2. "GAME OVER" title
- * 3. Final score display
- * 4. Buttons
+ * @brief Render game over screen
+ * Shows name input box if isTopScore is true
  */
 void GameOverScreen::render() {
-    // Draw background
     window.draw(background);
-    
-    // Draw title
     window.draw(gameOverText);
-    
-    // Draw score
     window.draw(scoreText);
-    
-    // Draw buttons
-    if (playAgainButton != nullptr) {
+
+    if (isTopScore) {
+        window.draw(namePromptText);
+        window.draw(nameInputBox);
+        window.draw(nameDisplayText);
+
+        if (submitButton) {
+            window.draw(*submitButton);
+        }
+    }
+
+    if (playAgainButton) {
         window.draw(*playAgainButton);
     }
-    if (mainMenuButton != nullptr) {
+    if (mainMenuButton) {
         window.draw(*mainMenuButton);
     }
 }
 
 /**
- * @brief Cleanup - delete all buttons
- * 
- * Called when transitioning away from this screen.
- * Properly deletes all allocated buttons.
+ * @brief Clean up all allocated buttons
  */
 void GameOverScreen::cleanup() {
     std::cout << "[GameOverScreen] cleanup() called" << std::endl;
-    
-    if (playAgainButton != nullptr) {
+
+    if (playAgainButton) {
         delete playAgainButton;
         playAgainButton = nullptr;
     }
-    
-    if (mainMenuButton != nullptr) {
+    if (mainMenuButton) {
         delete mainMenuButton;
         mainMenuButton = nullptr;
     }
-    
-    std::cout << "[GameOverScreen] All buttons deleted" << std::endl;
+    if (submitButton) {
+        delete submitButton;
+        submitButton = nullptr;
+    }
 }

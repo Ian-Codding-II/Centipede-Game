@@ -4,7 +4,6 @@
  * @brief Implementation of Bullet class
  * @version 1.0 - Grid-Based
  * @date 2025-11-26
- *
  * @copyright Copyright (c) 2025
  */
 
@@ -12,12 +11,19 @@
 #include <cmath>
 #include <iostream>
 
-
+// Define static member variables
 std::vector<Bullet*> Bullet::bullets;
 float Bullet::timeSinceLastShot = 0.0f;
 float Bullet::shootCooldown = 0.1f;
-// The actual shoot function
-void Bullet::shoot(sf::Vector2i playerPos, float deltaTime, sf::Texture& bulletTex)
+
+/**
+ * @brief The actual shoot function
+ * Handles keyboard input for space bar and creates bullets.
+ * @param playerPos Player position to spawn bullet from
+ * @param deltaTime Time since last frame
+ * @param bulletTex Bullet texture reference
+ */
+void Bullet::shoot(sf::Vector2f playerPos, float deltaTime, sf::Texture& bulletTex)
 {
     timeSinceLastShot += deltaTime;
 
