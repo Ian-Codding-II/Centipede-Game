@@ -43,6 +43,10 @@
  */
 class SettingsScreen : public Screen {
 private:
+    // Player sprite display
+    sf::Texture playerTexture;                        // Texture for player sprites
+    std::vector<sf::Sprite> playerIconSprites;        // 4 player sprites
+
     // Navigation button
     Button* backButton;           // "Back" - return to main menu
     
@@ -53,9 +57,6 @@ private:
     // Spawn level adjustment buttons
     Button* levelUpButton;        // "+" - increase spawn level
     Button* levelDownButton;      // "−" - decrease spawn level
-    
-    // Player icon selection buttons
-    std::vector<Button*> playerIconButtons;  // 4 buttons numbered 1-4
     
     // Settings values
     int lives;                    // Number of lives (1-5)

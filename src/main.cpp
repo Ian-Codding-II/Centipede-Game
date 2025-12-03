@@ -134,7 +134,7 @@ int main() {
          * This must happen after the window is created (OpenGL context needs to exist)
          *
          * What initialize() does:
-         * 1. Loads the shared font from assets/fonts/college.ttf
+         * 1. Loads the shared font from assets/fonts/Balins_Font.ttf
          * 2. Creates the initial screen (MainMenuScreen for MENU state)
          * 3. Sets up all UI elements
          */
@@ -172,7 +172,8 @@ int main() {
             /**
              * Calculate delta time (time since last frame in seconds)
              *
-             * clock.restart() does two things:wr creation)
+             * clock.restart() does two things:
+             * 1. Returns the elapsed time since the last call (or creation)
              * 2. Resets the clock to 0
              *
              * .asSeconds() converts the time to seconds as a float
@@ -211,6 +212,14 @@ int main() {
                 // Get the current game state
                 // Used to determine which system handles this event
                 GameState currentState = screenManager.getState();
+
+                // Check if the escape key was pressed.
+                if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Escape) {
+                    std::cout << "[ScreenManager] Escaped clicked - returning to previous screen if not in menu" << std::endl;
+                    if (currentState != GameState::MENU) {
+                        screenManager.setState(GameState::MENU);
+                    }
+                }
 
                 // ===== STATE-BASED EVENT HANDLING =====
 
@@ -275,26 +284,26 @@ int main() {
 
                     // ===== GAMEPLAY STATE =====
 
-                     case GameState::PLAYING:
-                         /**
-                          * Active gameplay state\
-                          * 
-                          * - Player can move and shoot
-                          * - Press ESC to pause
-                          * - Game class (not ScreenManager) handles all events
-                          */
-                        if (!game) {
-                            game = new Game(window, screenManager);
-                        }
-                        
-                        if(game){ // TEMP
+                case GameState::PLAYING:
+                    /**
+                     * Active gameplay state\
+                     *
+                     * - Player can move and shoot
+                     * - Press ESC to pause
+                     * - Game class (not ScreenManager) handles all events
+                     */
+                    if (game == nullptr) {
+                        std::cout << "[main] Creating Game object for PLAYING state\n";
+                        game = new Game(window, screenManager);
+                        game->initialize(); // Initialize the game (get settings, create objects)
+                        std::cout << "[main] Game initialized and ready to play\n";
+                    }
 
-                            //game->handleInput();
-                            //game.update(dt);
-                            //game->render();
-                         }
-                        //  game.handleInput(event);
-                         break;
+                    // Now game is guaranteed to be non-null
+                    if (game != nullptr) {
+                        game->handleInput(event);
+                    }
+                    break;
 
                 default:
                     /**
@@ -317,7 +326,6 @@ int main() {
             GameState currentState = screenManager.getState();
 
             if (currentState == GameState::PLAYING) {
-                
                 /**
                  * Gameplay update
                  * Called every frame with delta time to:
@@ -330,19 +338,17 @@ int main() {
                  * IMPORTANT: Pass dt to ensure frame-independent movement!
                  * Without dt, movement would be frame-dependent and vary with FPS.
                  */
-                   
-                   
+                
                 if (game != nullptr) {
                     game->update(dt);
 
                     // Check if Game class changed state (e.g., PLAYING -> PAUSED or GAME_OVER)
-                    /*
                     GameState newState = game->getState();
                     if (newState != currentState) {
                         std::cout << "[main] Game changed state from PLAYING to "
                                   << static_cast<int>(newState) << std::endl;
                         screenManager.setState(newState);
-                    } */
+                    }
                 }
 
             } else {
@@ -363,31 +369,26 @@ int main() {
              */
             window.clear(sf::Color::Black);
 
-             /**
-              * Render based on current state
-              * Each system draws its own content
-              */
-             if (currentState == GameState::PLAYING) {
-                 /**
-                  * Render gameplay
-                  * Draws: background, mushrooms, centipede, bullets, player, HUD
-                  */
-                    if(game!=nullptr)
-                    {
-                        game->handleInput(game->playerShape, &game->player, &game->bullet, dt);
-                        //game->update(dt);
-                        game->render();
-        
-                    }
-                 
-             } else {
-                 /**
-                  * Render UI screen
-                  * Draws: buttons, menus, leaderboard, pause screen, etc.
-                  * ScreenManager forwards to the appropriate Screen object
-                  */
-                 screenManager.render();
-             }
+            /**
+             * Render based on current state
+             * Each system draws its own content
+             */
+            if (currentState == GameState::PLAYING) {
+                /**
+                 * Render gameplay
+                 * Draws: background, mushrooms, centipede, bullets, player, HUD
+                 */
+                if (game != nullptr) {
+                    game->render();
+                }
+            } else {
+                /**
+                 * Render UI screen
+                 * Draws: buttons, menus, leaderboard, pause screen, etc.
+                 * ScreenManager forwards to the appropriate Screen object
+                 */
+                screenManager.render();
+            }
 
             /**
              * Display the rendered frame

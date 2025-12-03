@@ -7,7 +7,7 @@
 
 #include "../includes/collision_object.h"
 
-std::vector<c_obj*> c_obj::objects;
+std::vector<c_obj*> c_obj::objects; // Collidable objects
 
 /**
  * @brief Construct a new c_obj object
@@ -35,7 +35,7 @@ std::vector<c_obj*> c_obj::getCollided() {
     sf::FloatRect targetRegion = mSprite.getGlobalBounds();
     for (c_obj* obj: objects) {
         sf::FloatRect compareRegion = obj->mSprite.getGlobalBounds();
-        if (targetRegion.intersects(compareRegion)) {
+        if (targetRegion.intersects(compareRegion)) { // This simply stores a colliding object inside of the "collisions" vector
             collisions.push_back(obj);
         }
     }
@@ -48,9 +48,10 @@ std::vector<c_obj*> c_obj::getCollided() {
  * 
  * @param pos Vector2i (x,y)
  */
-void c_obj::setPosition(sf::Vector2i pos) {
+/*
+void setPosition(sf::Vector2i pos) {
     mSprite.setPosition(pos.x, pos.y);
-}
+}*/
 
 /**
  * @brief Sets sprite's TextureRect
@@ -61,4 +62,19 @@ void c_obj::setSpriteRect(sf::IntRect spriteTexture) {
     mSprite.setTextureRect(spriteTexture);
 }
 
+/**
+ * @brief Sets sprite scale
+ */
+void c_obj::setScale(sf::Vector2i factor) {
+    mSprite.setScale(sf::Vector2f(factor.x, factor.y));
+}
 
+/**
+ * @brief 
+ * 
+ * @param target 
+ * @param states 
+ */
+void c_obj::draw(sf::RenderTarget& target,sf::RenderStates states) const {
+    target.draw(mSprite, states);
+}

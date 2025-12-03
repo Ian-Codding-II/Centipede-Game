@@ -101,9 +101,9 @@ void ScreenManager::initialize() {
 
     // Try to load the font
     // The font file should be in assets/fonts/
-    if (!font.loadFromFile("assets/fonts/college.ttf")) {
+    if (!font.loadFromFile("assets/fonts/Balins_Font.ttf")) {
         // If font loading fails, throw an error
-        logError("ScreenManager", "Failed to load font: assets/fonts/college.ttf");
+        logError("ScreenManager", "Failed to load font: assets/fonts/Balins_Font.ttf");
         throw ResourceError("Font loading failed");
     }
 
@@ -142,14 +142,6 @@ void ScreenManager::update(sf::Event &event) {
     if (currentScreen == nullptr) {
         logError("ScreenManager", "currentScreen is nullptr in update()");
         return;
-    }
-
-    // Check if the escape key was pressed.
-    if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Escape) {
-        std::cout << "[ScreenManager] Escaped clicked - returning to previous screen if not in menu" << std::endl;
-        if (currentState != GameState::MENU) {
-            setState(GameState::MENU);
-        }
     }
 
     // Call the current screen's update method
