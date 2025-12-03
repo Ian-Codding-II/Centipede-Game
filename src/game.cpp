@@ -98,7 +98,7 @@ void Game::initialize() {
     player = new sf::RectangleShape();
     Player::startPlayer(*player, texture);
 
-    centipede = new Centipede(texture, 8, sf::Vector2f(200, 100), sf::Vector2i(2, 2));
+    centipede = new Centipede(texture, 5, sf::Vector2f(200, 100), sf::Vector2i(2, 2));
     std::cout << "[Game] Centipede created" << std::endl;
 
     generateMushrooms();
@@ -233,12 +233,14 @@ void Game::handleCollisions() {
             
             sf::FloatRect bulletBounds = Bullet::bullets[b]->getSprite().getGlobalBounds();
             sf::Vector2f centipedePos = centipede->getPosition();
-            sf::FloatRect centipedeBounds(centipedePos.x - 16, centipedePos.y - 16, 32, 32);
+            sf::FloatRect centipedeBounds(centipedePos.x , centipedePos.y , 32, 32);
             
             if (bulletBounds.intersects(centipedeBounds)) {
                 Bullet::bullets[b]->kill();
                 score += 100;
                 std::cout << "[Game] Bullet hit centipede! Score: " << score << std::endl;
+                Bullet::bullets[b]->kill();
+                centipede->hit();
             }
         }
     }
