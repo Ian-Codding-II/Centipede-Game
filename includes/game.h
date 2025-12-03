@@ -1,89 +1,80 @@
 /**
  * @file game.h
  * @author Ian Codding II
- * @brief Main Game class - coordinates all gameplay
- * @version 2.0 - Complete Integration
+ * @brief Header for Game class - integrated with existing classes
+ * @version 2.0 - Compatible with Balin's and Roman's code
  * @date 2025-11-26
  *
  * @copyright Copyright (c) 2025
  */
 
-#pragma once
+#ifndef GAME_H
+#define GAME_H
 
 #include <SFML/Graphics.hpp>
 #include <vector>
-#include <memory>
-
 #include "Game_State.h"
 #include "ScreenManager.h"
-#include "SettingsScreen.h"
 #include "GameGrid.h"
 #include "player.h"
-#include "Centipede.h"
 #include "bullet.h"
+#include "Centipede.h"
 #include "mushroom.h"
-#include "Collision_Manager.h"
+#include "SettingsScreen.h"
 
 /**
- * @class Game
- * @brief Main game class - manages all gameplay logic
+ * @brief Main Game class
  *
- * Responsibilities:
- * - Manage game state (playing, paused, game over)
- * - Update all game objects each frame
- * - Detect and handle collisions
- * - Render all game objects
- * - Handle score, lives, and level progression
- * - Coordinate with ScreenManager for UI
+ * Manages the main game loop, all game objects, and game state.
+ * Integrates with:
+ * - Roman's Player class
+ * - Balin's Centipede class
+ * - Balin's Mushroom class
+ * - Your Bullet and collision system
  */
 class Game {
 public:
     /**
-     * @brief Constructor - create the game
+     * @brief Constructor
      *
-     * @param win Reference to main window
-     * @param screenMngr Reference to ScreenManager
+     * @param win Reference to the main window
+     * @param screenMngr Reference to the ScreenManager
      */
     Game(sf::RenderWindow& win, ScreenManager& screenMngr);
 
     /**
-     * @brief Destructor - clean up all resources
+     * @brief Destructor
      */
     ~Game();
-
-    // ===== INITIALIZATION =====
-
-    /**
-     * @brief Initialize a new game
-     *
-     * Called when player starts a new game.
-     * Sets up:
-     * - Grid system
-     * - Player at starting position
-     * - Initial centipede(s)
-     * - Mushroom obstacles
-     * - Loads settings from SettingsScreen
-     */
-    void initialize();
 
     // ===== GAME LOOP =====
 
     /**
+     * @brief Initialize the game
+     *
+     * Called once at the start of gameplay.
+     * Sets up all game objects and initial state.
+     */
+    void initialize();
+
+    /**
      * @brief Handle input events
      *
-     * @param event SFML event from main loop
+     * @param event The SFML event to process
      */
     void handleInput(const sf::Event& event);
 
     /**
-     * @brief Update all game logic
+     * @brief Update game logic
      *
      * @param dt Delta time since last frame (seconds)
      */
     void update(float dt);
 
     /**
-     * @brief Render all game objects to screen
+     * @brief Render all game objects
+     *
+     * Draws everything to the window.
      */
     void render();
 
@@ -92,148 +83,95 @@ public:
     /**
      * @brief Get current game state
      *
-     * @return Current GameState (PLAYING, PAUSED, GAME_OVER, etc.)
+     * @return Current GameState
      */
     GameState getState() const;
 
     /**
-     * @brief Set game state (triggers transitions)
+     * @brief Set game state
      *
-     * @param newState State to transition to
+     * @param newState The new state to transition to
      */
     void setState(GameState newState);
 
     // ===== CLEANUP =====
 
     /**
-     * @brief Clean up all game resources
+     * @brief Clean up all resources
      *
-     * Called when game ends or transitioning to menu.
+     * Called before destruction to free memory.
      */
     void cleanup();
 
+    // ===== DEBUG =====
+
+    /**
+     * @brief Print debug information
+     */
+    void debugPrint() const;
+
 private:
-    // ===== REFERENCES =====
-    sf::RenderWindow& window;
-    ScreenManager& screenManager;
+    // ===== WINDOW & MANAGER =====
+    sf::RenderWindow& window;           ///< Reference to main window
+    ScreenManager& screenManager;       ///< Reference to ScreenManager
 
     // ===== GAME STATE =====
-    GameState currentState;
-    bool isGameOver;
-    bool isPaused;
-
-    // ===== GAME SYSTEMS =====
-    GameGrid* grid;
-    CollisionManager* collisionManager;
+    GameState currentState;             ///< Current game state (PLAYING, PAUSED, etc.)
+    bool isGameOver;                    ///< Is game over?
+    bool isPaused;                      ///< Is game paused?
 
     // ===== GAME OBJECTS =====
-    Player* player;
-    std::vector<Centipede*> centipedes;
-    std::vector<Bullet*> bullets;
-    std::vector<Mushroom*> mushrooms;
+    sf::RectangleShape* player;         ///< Pointer to player (Roman's class)
+    Centipede* centipede;               ///< Pointer to centipede
+    Bullet bulletObj;                   ///< Bullet object (handles all bullets)
+    std::vector<Mushroom*> mushrooms;   ///< All mushroom obstacles (Balin's class)
+    GameGrid* grid;                     ///< Grid system for mushroom positions
 
     // ===== GAME STATS =====
-    int score;
-    int lives;
-    int level;
+    int score;                          ///< Current score
+    int lives;                          ///< Remaining lives
+    int level;                          ///< Current level
 
     // ===== RENDERING =====
-    sf::Text scoreText;
-    sf::Text livesText;
-    sf::Text levelText;
-    sf::RectangleShape background;
+    sf::RectangleShape background;      ///< Black background
+    sf::Text scoreText;                 ///< Score display
+    sf::Text livesText;                 ///< Lives display
+    sf::Text levelText;                 ///< Level display
 
     // ===== TEXTURES =====
-    sf::Texture playerTexture;
-    sf::Texture centipedeHeadTexture;
-    sf::Texture centipedeBodyTexture;
-    sf::Texture centipedeTailTexture;
-    sf::Texture mushroomTexture;
-    sf::Texture bulletTexture;
+    sf::Texture playerTexture;          ///< Atlas texture
+    sf::Texture centipedeTexture;       ///< Points to atlas
+    sf::Texture mushroomTexture;        ///< Points to atlas
+    sf::Texture bulletTexture;          ///< Points to atlas
 
-    // ===== HELPER FUNCTIONS =====
+    // ===== PRIVATE HELPER FUNCTIONS =====
 
     /**
      * @brief Load all game textures
      *
-     * @return true if all textures loaded successfully
+     * @return true if all loaded successfully
      */
     bool loadTextures();
 
     /**
      * @brief Generate mushroom obstacles
-     *
-     * Called during initialize() and when completing levels.
      */
     void generateMushrooms();
 
     /**
-     * @brief Create initial centipede
-     */
-    void createInitialCentipede();
-
-    /**
-     * @brief Handle all collisions for this frame
+     * @brief Handle all collisions
      */
     void handleCollisions();
 
     /**
-     * @brief Handle player input from keyboard
-     */
-    void handleKeyboardInput();
-
-    /**
-     * @brief Process bullet collisions with centipedes
-     */
-    void processBulletCentipedeCollisions();
-
-    /**
-     * @brief Process bullet collisions with mushrooms
-     */
-    void processBulletMushroomCollisions();
-
-    /**
-     * @brief Check if player collides with any centipede
-     */
-    void checkPlayerCentipedeCollisions();
-
-    /**
-     * @brief Handle level progression when centipede is destroyed
-     */
-    void completeLevel();
-
-    /**
-     * @brief Handle player death
-     */
-    void playerDeath();
-
-    /**
-     * @brief Check game over condition
+     * @brief Check if game is over (lose condition)
      */
     void checkGameOver();
-
-    /**
-     * @brief Clean up dead bullets
-     */
-    void cleanupDeadBullets();
-
-    /**
-     * @brief Clean up destroyed mushrooms
-     */
-    void cleanupDestroyedMushrooms();
-
-    /**
-     * @brief Clean up dead centipedes
-     */
-    void cleanupDeadCentipedes();
 
     /**
      * @brief Update UI text displays
      */
     void updateUI();
-
-    /**
-     * @brief Debug - print game state to console
-     */
-    void debugPrint() const;
 };
+
+#endif // GAME_H

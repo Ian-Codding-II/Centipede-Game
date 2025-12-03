@@ -14,7 +14,8 @@
  */
 #ifndef PLAYER_H
 #define PLAYER_H
-#include "../includes/bullet.h"
+
+#include "bullet.h"
 #include <iostream>
 #include <SFML/Graphics.hpp>
 
@@ -24,12 +25,10 @@
  */
 class Player {
   public:
-    void startPlayer(sf::RectangleShape &rectangle, sf::Texture &playerTexture);
-    void movePlayer(sf::RectangleShape &playerRectangle);
+    static void startPlayer(sf::RectangleShape &rectangle, sf::Texture &playerTexture);
+    static void movePlayer(sf::RectangleShape &playerRectangle, float deltaTime);
     bool boundsChecking(int x, int y);
-    void playerShoot(sf::RectangleShape &playerRect, sf::RectangleShape &bulletShape, sf::Texture &bulletTexture, Bullet &projectile);
-
-    std::vector<sf::RectangleShape> bullets;
+    bool playerShoot(sf::RectangleShape &playerRect, sf::RectangleShape &bulletShape, sf::Texture &bulletTexture, Bullet &projectile);
 
   private:
 };

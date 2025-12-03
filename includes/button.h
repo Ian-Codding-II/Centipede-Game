@@ -13,7 +13,7 @@
 #include <iostream>
 #include <SFML/Graphics.hpp>
 
-enum state { normal,
+enum buttonState { normalButton,
              hovered,
              clicked };
 
@@ -40,7 +40,7 @@ class Button : public sf::Drawable {
     const sf::Text &getSFMLText() const { return mText; }
     std::string getText() const; // NEW: Returns the label as std::string
 
-    // This function update the button state and/or look
+    // This function update the button buttonState and/or look
     void update(sf::Event &e, sf::RenderWindow &window);
     virtual void draw(sf::RenderTarget &target, sf::RenderStates states) const;
 

@@ -8,7 +8,6 @@
  * @copyright Copyright (c) 2025
  */
 #include "../includes/player.h"
-#include "../includes/bullet.h"
 #include <iostream>
 #include <SFML/Graphics.hpp>
 
@@ -32,45 +31,34 @@ void Player::startPlayer(sf::RectangleShape &rectangle, sf::Texture &playerTextu
     rectangle.setTexture(&playerTexture);
 }
 
-void Player::movePlayer(sf::RectangleShape &playerRectangle) {
+void Player::movePlayer(sf::RectangleShape &playerRectangle, float deltaTime) {
     sf::Vector2f pos = playerRectangle.getPosition();
-    std::cout << "The current player position is equal to x: " << pos.x << " and y: " << pos.y << '\n';
+    float speed = 500.f;
 
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left) || sf::Keyboard::isKeyPressed(sf::Keyboard::A) && boundsChecking(pos.x, pos.y)) {
-        if (boundsChecking(pos.x - 15, pos.y))
-            ;
-        playerRectangle.setPosition(pos.x - 15, pos.y); // Move left 20 pixels
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::A) || sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
+        pos.x -= speed * deltaTime;
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::D) || sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
+        pos.x += speed * deltaTime;
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::W) || sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
+        pos.y -= speed * deltaTime;
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::S) || sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
+        pos.y += speed * deltaTime;
 
-    } else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right) || sf::Keyboard::isKeyPressed(sf::Keyboard::D) && boundsChecking(pos.x, pos.y)) {
-        if (boundsChecking(pos.x + 15, pos.y))
-            ;
-        playerRectangle.setPosition(pos.x + 15, pos.y); // Move right 20 pixels
+    float left = 0.f;
+    float right = 1200.f - playerRectangle.getSize().x;
+    float top = 600.f;
+    float bottom = 800.f - playerRectangle.getSize().y;
 
-    } else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down) || sf::Keyboard::isKeyPressed(sf::Keyboard::S) && boundsChecking(pos.x, pos.y)) {
-        if (boundsChecking(pos.x, pos.y + 15))
-            ;
-        playerRectangle.setPosition(pos.x, pos.y + 15); // Move down 20 pixels
-    } else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up) || sf::Keyboard::isKeyPressed(sf::Keyboard::W) && boundsChecking(pos.x, pos.y)) {
-        if (boundsChecking(pos.x, pos.y - 15))
-            ;
-        playerRectangle.setPosition(pos.x, pos.y - 15); // Move up 20 pixels
-    }
+    if (pos.x < left)
+        pos.x = left;
+    if (pos.x > right)
+        pos.x = right;
+    if (pos.y < top)
+        pos.y = top;
+    if (pos.y > bottom)
+        pos.y = bottom;
 
-    // This is temporary bounds checking. Intentionally rough
-    if (pos.x <= 5 && pos.y > 405) {
-        playerRectangle.setPosition(6, pos.y); // Seems to work
-    } else if (pos.x <= 5 && pos.y <= 405) {
-        playerRectangle.setPosition(pos.x + 1, 406);
-    } else if (pos.y < 405) {
-        playerRectangle.setPosition(pos.x, 406);
-
-    } else if (pos.x > 795 && pos.y <= 595) {
-        playerRectangle.setPosition(770, pos.y);
-    } else if (pos.x > 795 && pos.y >= 595) {
-        playerRectangle.setPosition(pos.x - 1, pos.y - 1);
-    } else if (pos.y >= 595) {
-        playerRectangle.setPosition(pos.x, 570);
-    }
+    playerRectangle.setPosition(pos);
 }
 
 bool Player::boundsChecking(int x, int y) {
@@ -78,18 +66,6 @@ bool Player::boundsChecking(int x, int y) {
         return 0;
     }
     return 1;
-}
-
-void Player::playerShoot(sf::RectangleShape &playerRect, sf::RectangleShape &bulletShape, sf::Texture &bulletTexture, Bullet &projectile) {
-    sf::Vector2f pos;
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space)) {
-        pos = playerRect.getPosition();
-        std::cout << "Current bullet position x: " << pos.x << " y: " << pos.y << '\n';
-        projectile.bullets.push_back(bulletShape);
-
-        // std::cout << projectile.bullets.size();
-        bulletShape.setPosition(pos.x + 9, pos.y);
-    }
 }
 
 // #include "../includes/player.h"

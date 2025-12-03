@@ -1,8 +1,8 @@
 /**
  * @file game.cpp
  * @author Ian Codding II
- * @brief Implementation of Game class
- * @version 1.0 - Complete Integration
+ * @brief Implementation of Game class - WITHOUT centipede for now
+ * @version 2.1 - Testing player, bullets, and mushrooms only
  * @date 2025-11-26
  *
  * @copyright Copyright (c) 2025
@@ -10,11 +10,12 @@
 
 #include "../includes/game.h"
 #include "../includes/errorHandler.h"
+#include "../includes/GameGrid.h"
 #include <iostream>
 #include <cstdlib>
 
 /**
- * @brief Constructor - create the game
+ * @brief Constructor - initialize the game
  */
 Game::Game(sf::RenderWindow& win, ScreenManager& screenMngr)
     : window(win),
@@ -22,12 +23,15 @@ Game::Game(sf::RenderWindow& win, ScreenManager& screenMngr)
       currentState(GameState::PLAYING),
       isGameOver(false),
       isPaused(false),
-      grid(nullptr),
-      collisionManager(nullptr),
-      player(nullptr),
       score(0),
       lives(3),
-      level(1) {
+      level(1),
+      player(nullptr),
+      centipede(nullptr),
+      grid(nullptr),
+      playerTexture(),
+      mushroomTexture(),
+      bulletTexture() {
 
     std::cout << "[Game] Constructor called" << std::endl;
 
@@ -79,14 +83,14 @@ Game::~Game() {
 void Game::initialize() {
     std::cout << "[Game] initialize() called" << std::endl;
 
-    // Create grid system
+    // Create game grid
     if (grid == nullptr) {
         grid = new GameGrid(1200, 800);
-    }
-
-    // Create collision manager
-    if (collisionManager == nullptr) {
-        collisionManager = new CollisionManager(grid);
+        std::cout << "[Game] Game grid created (1200x800, 32x32 cells)" << std::endl;
+    } else {
+        // Clear grid if reinitializing
+        delete grid;
+        grid = new GameGrid(1200, 800);
     }
 
     // Get settings from SettingsScreen
@@ -96,11 +100,9 @@ void Game::initialize() {
     if (settings != nullptr) {
         lives = settings->getLives();
         level = settings->getSpawnLevel();
-        int playerIcon = settings->getSelectedPlayerIcon();
 
         std::cout << "[Game] Loaded settings: Lives=" << lives
-                  << ", Level=" << level
-                  << ", PlayerIcon=" << playerIcon << std::endl;
+                  << ", Level=" << level << std::endl;
     }
 
     // Reset score
@@ -108,42 +110,21 @@ void Game::initialize() {
     isGameOver = false;
     isPaused = false;
 
-    // Create player
-    if (player == nullptr) {
-        player = new Player(grid, playerTexture);
-    } else {
-        player->reset();
-    }
+    // Create player using Roman's startPlayer function
+    player = new sf::RectangleShape();
+    Player::startPlayer(*player, playerTexture);
 
-    // Clear existing objects
-    for (auto centipede : centipedes) {
-        delete centipede;
-    }
-    centipedes.clear();
-
-    for (auto bullet : bullets) {
-        delete bullet;
-    }
-    bullets.clear();
-
-    for (auto mushroom : mushrooms) {
-        delete mushroom;
-    }
-    mushrooms.clear();
-
-    // Create initial centipede
-    createInitialCentipede();
-
-    // Generate mushrooms
+    // Generate initial mushrooms
     generateMushrooms();
 
     std::cout << "[Game] Game initialized - ready to play!" << std::endl;
+    std::cout << "[Game] Testing: Player, Bullets, and Mushrooms only (no centipede yet)" << std::endl;
 }
 
 // ===== GAME LOOP =====
 
 /**
- * @brief Handle input
+ * @brief Handle input events
  */
 void Game::handleInput(const sf::Event& event) {
     if (isGameOver) {
@@ -151,7 +132,7 @@ void Game::handleInput(const sf::Event& event) {
     }
 
     if (event.type == sf::Event::KeyPressed) {
-        if (event.key.code == sf::Keyboard::Escape || event.key.code == sf::Keyboard::P) {
+        if (event.key.code == sf::Keyboard::P) {
             isPaused = !isPaused;
             if (isPaused) {
                 currentState = GameState::PAUSED;
@@ -162,13 +143,6 @@ void Game::handleInput(const sf::Event& event) {
             }
         }
     }
-
-    // Only handle game input if not paused
-    if (isPaused) {
-        return;
-    }
-
-    // Continuous input handled in update()
 }
 
 /**
@@ -179,58 +153,62 @@ void Game::update(float dt) {
         return;
     }
 
-    // Handle keyboard input (continuous)
-    handleKeyboardInput();
-
-    // Update player
+    // Update player movement using Roman's code
     if (player) {
-        player->update(dt);
+        Player::movePlayer(*player, dt);
     }
 
-    // Update all centipedes
-    for (auto centipede : centipedes) {
-        if (centipede) {
-            centipede->update(dt);
+    // Update bullets - handle shooting and movement
+    // Create a temporary bullet shape for new bullets
+    sf::RectangleShape tempBullet;
+    tempBullet.setSize(sf::Vector2f(10.f, 10.f));
+    bulletObj.isShooting(*player, tempBullet, bulletTexture, bulletObj, dt);
+    
+    // Move bullets upward
+    for (int i = static_cast<int>(bulletObj.bullets.size()) - 1; i >= 0; i--) {
+        sf::Vector2f bulletPos = bulletObj.bullets[i].getPosition();
+        bulletPos.y -= 500 * dt;  // Move up at 500 pixels/second
+        bulletObj.bullets[i].setPosition(bulletPos);
+        
+        // Remove if off-screen
+        if (bulletPos.y < 0) {
+            bulletObj.bullets.erase(bulletObj.bullets.begin() + i);
+            std::cout << "[Game] Bullet removed (off-screen)" << std::endl;
         }
     }
 
-    // Update all bullets
-    for (auto bullet : bullets) {
-        if (bullet) {
-            bullet->update(dt);
-        }
-    }
-
-    // Update all mushrooms
+    // Update mushrooms
     for (auto mushroom : mushrooms) {
         if (mushroom) {
-            mushroom->update(dt);
+            mushroom->update();
         }
     }
 
-    // Update UI
-    updateUI();
-
-    // Handle all collisions
+    // Check collisions (bullets vs mushrooms ONLY for now)
     handleCollisions();
 
-    // Clean up dead objects
-    cleanupDeadBullets();
-    cleanupDestroyedMushrooms();
-    cleanupDeadCentipedes();
-
-    // Check win/lose conditions
-    checkGameOver();
-    if (centipedes.empty() && !isGameOver) {
-        completeLevel();
+    // Clean up destroyed mushrooms
+    for (int i = mushrooms.size() - 1; i >= 0; i--) {
+        // Check if mushroom is destroyed by trying to get its state
+        // Since there's no public health getter, we check if it doesn't render anymore
+        // For now, we'll keep all mushrooms - destruction is handled by hit()
     }
 
     // Update UI
     updateUI();
+
+    // Check game over condition
+    checkGameOver();
+
+    // Debug output
+    static int frameCount = 0;
+    if (++frameCount % 60 == 0) {  // Every 60 frames
+        debugPrint();
+    }
 }
 
 /**
- * @brief Render all objects
+ * @brief Render all game objects
  */
 void Game::render() {
     // Draw background
@@ -243,18 +221,9 @@ void Game::render() {
         }
     }
 
-    // Draw centipedes
-    for (auto centipede : centipedes) {
-        if (centipede) {
-            window.draw(*centipede);
-        }
-    }
-
     // Draw bullets
-    for (auto bullet : bullets) {
-        if (bullet && bullet->isAlive()) {
-            window.draw(*bullet);
-        }
+    for (auto& bullet : bulletObj.bullets) {
+        window.draw(bullet);
     }
 
     // Draw player
@@ -271,7 +240,7 @@ void Game::render() {
 // ===== STATE MANAGEMENT =====
 
 /**
- * @brief Get current state
+ * @brief Get current game state
  */
 GameState Game::getState() const {
     return currentState;
@@ -301,30 +270,18 @@ void Game::cleanup() {
         player = nullptr;
     }
 
-    // Delete centipedes
-    for (auto centipede : centipedes) {
-        delete centipede;
-    }
-    centipedes.clear();
-
-    // Delete bullets
-    for (auto bullet : bullets) {
-        delete bullet;
-    }
-    bullets.clear();
-
-    // Delete mushrooms
+    // Clear mushrooms
     for (auto mushroom : mushrooms) {
-        delete mushroom;
+        if (mushroom != nullptr) {
+            delete mushroom;
+        }
     }
     mushrooms.clear();
 
-    // Delete systems
-    if (collisionManager != nullptr) {
-        delete collisionManager;
-        collisionManager = nullptr;
-    }
+    // Clear bullets
+    bulletObj.bullets.clear();
 
+    // Delete grid
     if (grid != nullptr) {
         delete grid;
         grid = nullptr;
@@ -336,206 +293,109 @@ void Game::cleanup() {
 // ===== PRIVATE HELPER FUNCTIONS =====
 
 /**
- * @brief Load all textures
+ * @brief Load all textures from atlas
  */
 bool Game::loadTextures() {
-    bool allLoaded = true;
-
-    // Load single atlas texture that contains all sprites
+    // Load single atlas texture
     if (!playerTexture.loadFromFile("assets/sprites/atlas.png")) {
-        logError("Game", "Failed to load atlas texture");
+        logError("Game", "Failed to load player texture");
         return false;
     }
 
-    // All textures point to the same atlas, but use different IntRects
-    centipedeHeadTexture = playerTexture;
-    centipedeBodyTexture = playerTexture;
-    centipedeTailTexture = playerTexture;
+    // All textures point to same atlas
     mushroomTexture = playerTexture;
     bulletTexture = playerTexture;
 
-    std::cout << "[Game] Atlas texture loaded successfully" << std::endl;
+    std::cout << "[Game] All textures loaded successfully" << std::endl;
     return true;
 }
 
 /**
- * @brief Generate mushroom obstacles
+ * @brief Generate mushroom obstacles using grid
  */
 void Game::generateMushrooms() {
-    // Generate 15-20 mushrooms based on level
-    int mushroomCount = 15 + (level * 2);
+    if (grid == nullptr) {
+        std::cerr << "[Game] ERROR: Grid not initialized for mushroom generation!" << std::endl;
+        return;
+    }
+
+    int mushroomCount = 10 + (level * 2);
+
+    std::cout << "[Game] Generating " << mushroomCount << " mushrooms..." << std::endl;
 
     for (int i = 0; i < mushroomCount; i++) {
+        // Get random empty cell from grid
         auto [gridX, gridY] = grid->getRandomEmptyCell();
 
-        Mushroom* mushroom = new Mushroom(grid, mushroomTexture, gridX, gridY, 4, NORMAL);
+        // Convert grid coordinates to pixel coordinates (center of cell)
+        sf::Vector2f pixelPos = grid->gridToCenterPixel(gridX, gridY);
+
+        // Create mushroom using Balin's class
+        // Mushroom(texture, spriteTexture, position, health, isSuper)
+        Mushroom* mushroom = new Mushroom(
+            mushroomTexture,
+            sf::IntRect(64, 64, 32, 32),  // Mushroom sprite in atlas - ADJUST IF NEEDED
+            sf::Vector2i(static_cast<int>(pixelPos.x), static_cast<int>(pixelPos.y)),
+            4,      // Health (4 hits to destroy)
+            false   // Not super
+        );
+        
+        // Mark mushroom location on grid
+        grid->setOccupied(gridX, gridY, MUSHROOM);
+        
         mushrooms.push_back(mushroom);
     }
 
-    std::cout << "[Game] Generated " << mushrooms.size() << " mushrooms" << std::endl;
-}
-
-/**
- * @brief Create initial centipede
- */
-void Game::createInitialCentipede() {
-    int length = 10 + (level * 2);  // Longer centipedes on higher levels
-
-    Centipede* centipede = new Centipede(
-        grid,
-        centipedeHeadTexture,
-        centipedeBodyTexture,
-        centipedeTailTexture,
-        length,
-        MOVING_RIGHT
-    );
-
-    centipedes.push_back(centipede);
-
-    std::cout << "[Game] Created centipede with " << length << " segments" << std::endl;
+    std::cout << "[Game] Created " << mushrooms.size() << " mushrooms" << std::endl;
 }
 
 /**
  * @brief Handle all collisions
+ * 
+ * Currently tests: Bullets vs Mushrooms only
+ * Uses public API for Balin's Mushroom class
  */
 void Game::handleCollisions() {
-    processBulletCentipedeCollisions();
-    processBulletMushroomCollisions();
-    checkPlayerCentipedeCollisions();
-}
+    if (!player || !grid) return;
 
-/**
- * @brief Handle keyboard input
- */
-void Game::handleKeyboardInput() {
-    if (!player) return;
+    // ===== CHECK BULLET vs MUSHROOM COLLISIONS =====
+    for (int b = static_cast<int>(bulletObj.bullets.size()) - 1; b >= 0; b--) {
+        sf::FloatRect bulletBounds = bulletObj.bullets[b].getGlobalBounds();
 
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left) || sf::Keyboard::isKeyPressed(sf::Keyboard::A)) {
-        player->moveLeft();
-    }
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right) || sf::Keyboard::isKeyPressed(sf::Keyboard::D)) {
-        player->moveRight();
-    }
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up) || sf::Keyboard::isKeyPressed(sf::Keyboard::W)) {
-        player->moveUp();
-    }
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down) || sf::Keyboard::isKeyPressed(sf::Keyboard::S)) {
-        player->moveDown();
-    }
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space)) {
-        if (player->canShoot()) {
-            auto [bulletX, bulletY] = player->shoot();
+        for (int m = 0; m < static_cast<int>(mushrooms.size()); m++) {
+            // Get mushroom position using public getPosition()
+            sf::Vector2i mushroomPos = mushrooms[m]->getPosition();
+            
+            // Estimate mushroom bounds (32x32 sprite, origin at center)
+            sf::FloatRect mushroomBounds(mushroomPos.x - 16, mushroomPos.y - 16, 32, 32);
 
-            if (bulletX >= 0 && bulletY >= 0) {
-                Bullet* bullet = new Bullet(grid, bulletTexture, bulletX, bulletY);
-                bullets.push_back(bullet);
+            if (bulletBounds.intersects(mushroomBounds)) {
+                // Hit mushroom!
+                std::cout << "[Game] Bullet hit mushroom!" << std::endl;
+                
+                bulletObj.bullets.erase(bulletObj.bullets.begin() + b);
+                mushrooms[m]->hit(1);  // Damage mushroom by 1 HP
+                score += 5;
+
+                // Clear mushroom from grid
+                int mushX = grid->pixelToGridX(mushroomPos.x);
+                int mushY = grid->pixelToGridY(mushroomPos.y);
+                grid->clearOccupied(mushX, mushY, MUSHROOM);
+
+                std::cout << "[Game] Score: " << score << std::endl;
+                return;  // Exit to avoid checking more after erasing
             }
         }
     }
 }
 
 /**
- * @brief Process bullet vs centipede collisions
- */
-void Game::processBulletCentipedeCollisions() {
-    for (int b = 0; b < static_cast<int>(bullets.size()); b++) {
-        if (!bullets[b] || !bullets[b]->isAlive()) {
-            continue;
-        }
-
-        for (int c = 0; c < static_cast<int>(centipedes.size()); c++) {
-            if (!centipedes[c]) {
-                continue;
-            }
-
-            CollisionResult result = collisionManager->checkBulletCentipede(bullets[b], centipedes[c]);
-
-            if (result.collided) {
-                bullets[b]->kill();
-                score += 100;
-
-                Centipede* newCentipede = centipedes[c]->shootSegment(result.data);
-
-                if (newCentipede != nullptr) {
-                    centipedes.push_back(newCentipede);
-                }
-
-                break;
-            }
-        }
-    }
-}
-
-/**
- * @brief Process bullet vs mushroom collisions
- */
-void Game::processBulletMushroomCollisions() {
-    for (int b = 0; b < static_cast<int>(bullets.size()); b++) {
-        if (!bullets[b] || !bullets[b]->isAlive()) {
-            continue;
-        }
-
-        Mushroom* hitMushroom = collisionManager->checkBulletMushroom(bullets[b], mushrooms);
-
-        if (hitMushroom) {
-            bullets[b]->kill();
-
-            if (hitMushroom->takeDamage()) {
-                score += 10;  // Mushroom destroyed
-            } else {
-                score += 5;   // Mushroom damaged
-            }
-        }
-    }
-}
-
-/**
- * @brief Check player vs centipede collisions
- */
-void Game::checkPlayerCentipedeCollisions() {
-    if (!player) return;
-
-    if (collisionManager->checkPlayerCentipedes(player, centipedes)) {
-        playerDeath();
-    }
-}
-
-/**
- * @brief Complete level
- */
-void Game::completeLevel() {
-    level++;
-    score += 1000;  // Bonus for level completion
-
-    std::cout << "[Game] Level complete! Moving to level " << level << std::endl;
-
-    // Clear mushrooms
-    for (auto mushroom : mushrooms) {
-        delete mushroom;
-    }
-    mushrooms.clear();
-
-    // Create new centipede and mushrooms
-    createInitialCentipede();
-    generateMushrooms();
-}
-
-/**
- * @brief Handle player death
- */
-void Game::playerDeath() {
-    lives--;
-    std::cout << "[Game] Player died! Lives remaining: " << lives << std::endl;
-
-    if (lives > 0) {
-        player->reset();
-    }
-}
-
-/**
- * @brief Check game over
+ * @brief Check if game is over
  */
 void Game::checkGameOver() {
+    // For now, game ends if lives <= 0
+    // TODO: Add centipede collision check later
+    
     if (lives <= 0) {
         isGameOver = true;
         currentState = GameState::GAME_OVER;
@@ -544,46 +404,7 @@ void Game::checkGameOver() {
 }
 
 /**
- * @brief Clean up dead bullets
- */
-void Game::cleanupDeadBullets() {
-    for (int i = 0; i < static_cast<int>(bullets.size()); i++) {
-        if (!bullets[i]->isAlive()) {
-            delete bullets[i];
-            bullets.erase(bullets.begin() + i);
-            i--;
-        }
-    }
-}
-
-/**
- * @brief Clean up destroyed mushrooms
- */
-void Game::cleanupDestroyedMushrooms() {
-    for (int i = 0; i < static_cast<int>(mushrooms.size()); i++) {
-        if (mushrooms[i]->isDestroyed()) {
-            delete mushrooms[i];
-            mushrooms.erase(mushrooms.begin() + i);
-            i--;
-        }
-    }
-}
-
-/**
- * @brief Clean up dead centipedes
- */
-void Game::cleanupDeadCentipedes() {
-    for (int i = 0; i < static_cast<int>(centipedes.size()); i++) {
-        if (!centipedes[i]->isAlive()) {
-            delete centipedes[i];
-            centipedes.erase(centipedes.begin() + i);
-            i--;
-        }
-    }
-}
-
-/**
- * @brief Update UI text
+ * @brief Update UI text displays
  */
 void Game::updateUI() {
     scoreText.setString("Score: " + std::to_string(score));
@@ -595,12 +416,16 @@ void Game::updateUI() {
  * @brief Debug print
  */
 void Game::debugPrint() const {
-    std::cout << "\n[Game] Debug Info:" << std::endl;
+    std::cout << "\n[Game] === DEBUG INFO ===" << std::endl;
     std::cout << "  Score: " << score << std::endl;
     std::cout << "  Lives: " << lives << std::endl;
     std::cout << "  Level: " << level << std::endl;
-    std::cout << "  Centipedes: " << centipedes.size() << std::endl;
-    std::cout << "  Bullets: " << bullets.size() << std::endl;
+    std::cout << "  Bullets: " << bulletObj.bullets.size() << std::endl;
     std::cout << "  Mushrooms: " << mushrooms.size() << std::endl;
+    
+    if (player) {
+        std::cout << "  Player pos: (" << player->getPosition().x << ", " 
+                  << player->getPosition().y << ")" << std::endl;
+    }
     std::cout << std::endl;
 }
