@@ -22,7 +22,8 @@ class c_obj : public sf::Drawable {
         void setPosition(sf::Vector2f pos);
         void setSpriteRect(sf::IntRect spriteTexture);
         void setScale(sf::Vector2i factor);
-
+        
+        std::string getName() const {return mName;};
         sf::Sprite getSprite() const {return mSprite;};
         sf::Vector2f getPosition() const {return mPosition;};
 
