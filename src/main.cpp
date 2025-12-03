@@ -2,7 +2,7 @@
  * @file main.cpp
  * @author Ian Codding II
  * @brief Entry point for Centipede game - sets up window and main loop
- * @version 2.0
+ * @version 2.1 - Fixed pause/resume state management
  * @date 2025-10-27
  *
  * @copyright Copyright (c) 2025
@@ -12,6 +12,7 @@
 #include "../includes/game.h"
 #include "../includes/Game_State.h"
 #include "../includes/ScreenManager.h"
+#include <cstddef>
 #include <iostream>
 #include <SFML/Graphics.hpp>
 #include <SFML/System/Clock.hpp>
@@ -56,6 +57,7 @@
  */
 int main() {
     try {
+        srand(time(NULL));
         std::cout << "========================================" << std::endl;
         std::cout << "     CENTIPEDE GAME - Starting" << std::endl;
         std::cout << "========================================" << std::endl;
@@ -134,7 +136,7 @@ int main() {
          * This must happen after the window is created (OpenGL context needs to exist)
          *
          * What initialize() does:
-         * 1. Loads the shared font from assets/fonts/college.ttf
+         * 1. Loads the shared font from assets/fonts/Balins_Font.ttf
          * 2. Creates the initial screen (MainMenuScreen for MENU state)
          * 3. Sets up all UI elements
          */
@@ -269,33 +271,84 @@ int main() {
                      * - User can Resume, go to Main Menu, or Quit
                      * - ScreenManager (PauseScreen) handles these buttons
                      * - Game object is NOT updated while paused
+                     * - PauseScreen returns next state which we check after this loop
                      */
                     screenManager.update(event);
+                    {
+                        // Check what state the ScreenManager transitioned to after pause screen input
+                        GameState newScreenState = screenManager.getState();
+                        
+                        // If pause screen changed state to PLAYING (resume clicked)
+                        if (newScreenState == GameState::PLAYING && game != nullptr) {
+                            std::cout << "[main] Resume clicked - resuming game" << std::endl;
+                            game->setPaused(false);
+                        }
+                        // If pause screen changed state to MENU (main menu clicked)
+                        else if (newScreenState == GameState::MENU && game != nullptr) {
+                            std::cout << "[main] Main Menu clicked from pause - cleaning up game" << std::endl;
+                            game->cleanup();
+                            delete game;
+                            game = nullptr;
+                        }
+                    }
                     break;
 
                 case GameState::GAME_OVER:
                     /**
                      * Game over state
+                     * - User can enter name if top 10 score
                      * - User can Play Again or return to Main Menu
                      * - ScreenManager (GameOverScreen) handles these buttons
                      */
                     screenManager.update(event);
+                    {
+                        // Check what state the ScreenManager transitioned to after game over screen input
+                        GameState newScreenState = screenManager.getState();
+                        
+                        // If game over screen changed state to PLAYING (play again clicked)
+                        if (newScreenState == GameState::PLAYING && game != nullptr) {
+                            std::cout << "[main] Play Again clicked - resetting game" << std::endl;
+                            game->cleanup();
+                            delete game;
+                            game = nullptr;
+                            
+                            // Reset game over screen for next time
+                            GameOverScreen *gameOverScreen =
+                                (GameOverScreen *)screenManager.getScreen(GameState::GAME_OVER);
+                            if (gameOverScreen != nullptr) {
+                                gameOverScreen->reset();
+                            }
+                        }
+                        // If game over screen changed state to MENU (main menu clicked)
+                        else if (newScreenState == GameState::MENU && game != nullptr) {
+                            std::cout << "[main] Main Menu clicked from game over - cleaning up game" << std::endl;
+                            game->cleanup();
+                            delete game;
+                            game = nullptr;
+                            
+                            // Reset game over screen for next time
+                            GameOverScreen *gameOverScreen =
+                                (GameOverScreen *)screenManager.getScreen(GameState::GAME_OVER);
+                            if (gameOverScreen != nullptr) {
+                                gameOverScreen->reset();
+                            }
+                        }
+                    }
                     break;
 
                     // ===== GAMEPLAY STATE =====
 
                 case GameState::PLAYING:
                     /**
-                     * Active gameplay state\
-                     *
+                     * Active gameplay state
                      * - Player can move and shoot
-                     * - Press ESC to pause
+                     * - Press P or ESC to pause
                      * - Game class (not ScreenManager) handles all events
                      */
                     if (game == nullptr) {
                         std::cout << "[main] Creating Game object for PLAYING state\n";
                         game = new Game(window, screenManager);
-                        game->initualize(); // Initialize the game (get settings, create objects)
+                        game->initialize(); // Initialize the game (get settings, create objects)
                         std::cout << "[main] Game initialized and ready to play\n";
                     }
 
@@ -338,6 +391,7 @@ int main() {
                  * IMPORTANT: Pass dt to ensure frame-independent movement!
                  * Without dt, movement would be frame-dependent and vary with FPS.
                  */
+                
                 if (game != nullptr) {
                     game->update(dt);
 
@@ -352,8 +406,8 @@ int main() {
 
             } else {
                 /**
-                 * UI update
-                 * ScreenManager doesn't need per-frame updates
+                 * Other UI states update
+                 * ScreenManager doesn't need per-frame updates for most screens
                  * (It handles everything in event processing)
                  *
                  * Note: We could add animations here if needed

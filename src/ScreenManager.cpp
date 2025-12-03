@@ -101,9 +101,9 @@ void ScreenManager::initialize() {
 
     // Try to load the font
     // The font file should be in assets/fonts/
-    if (!font.loadFromFile("assets/fonts/college.ttf")) {
+    if (!font.loadFromFile("assets/fonts/Balins_Font.ttf")) {
         // If font loading fails, throw an error
-        logError("ScreenManager", "Failed to load font: assets/fonts/college.ttf");
+        logError("ScreenManager", "Failed to load font: assets/fonts/Balins_Font.ttf");
         throw ResourceError("Font loading failed");
     }
 
@@ -288,7 +288,7 @@ Screen *ScreenManager::getScreen(GameState state) {
 
     case GameState::GAME_OVER:
         // Create a GameOverScreen
-        newScreen = new GameOverScreen(window, font);
+        newScreen = new GameOverScreen(window, font, *this);
         break;
 
     case GameState::LEADERBOARD:

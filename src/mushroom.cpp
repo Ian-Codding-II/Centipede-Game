@@ -14,40 +14,41 @@ const int MAXHEALTH = 4;
 
 /**
  * @brief Construct a new Mushroom:: Mushroom object w/ float vector2 and health
- * 
+ *
  * @param pos   Vector2f position
  * @param hp    0 < hp <= 4 Number of hitpoints/health
  */
-Mushroom::Mushroom(sf::Texture& texture, sf::IntRect spriteTexture, sf::Vector2i pos, int hp, bool isSuper) : c_obj(texture, spriteTexture, pos) {
+Mushroom::Mushroom(sf::Texture &texture, sf::IntRect spriteTexture, sf::Vector2f pos, int hp, bool isSuper)
+    : c_obj(texture, spriteTexture, pos, "Mushroom") {
 
     if (isSuper) {
         mShroomState = super;
     } else {
         mShroomState = normal;
     }
-    
+
     if (hp <= 0)
         mHealth = 1;
     else if (hp >= MAXHEALTH)
         mHealth = MAXHEALTH;
-    
+
     updateTexture();
-    
+    mSprite.setScale(2, 2);
 }
 
 /**
  * @brief Damages mushroom for percentage
- * 
+ *
  * @param dmg Percentage of hit points
  */
 void Mushroom::hit(float dmg) {
-    int hp = mHealth*dmg;
+    int hp = mHealth * dmg;
     hit(hp);
 }
 
 /**
  * @brief Damages muchroom for int points
- * 
+ *
  * @param dmg Number of hit points
  */
 void Mushroom::hit(int dmg) {
@@ -64,7 +65,7 @@ void Mushroom::hit(int dmg) {
 
 /**
  * @brief Updates the texture on the mushroom
- * 
+ *
  */
 void Mushroom::updateTexture() {
     // if (mHealth == 0 or mShroomState == destroy) {
@@ -72,60 +73,59 @@ void Mushroom::updateTexture() {
     // }
 
     switch (mShroomState) {
-        case normal:
-            if (mHealth > (MAXHEALTH * 0.75)) { // If > 75%
-                // Full Mushroom
-                setSpriteRect(sf::IntRect(8*8, 8*2, 8, 8));
-            } else if (mHealth > (MAXHEALTH * 0.5) and mHealth <= (MAXHEALTH * 0.75)) { // If  > 50% and < 75%
-                // Hit Mushroom
-                setSpriteRect(sf::IntRect(8*9, 8*2, 8, 8));
-            } else if (mHealth > (MAXHEALTH * 0.25) and mHealth <= (MAXHEALTH * 0.5)) { // If > 25% and < 50%
-                // Damaged Mushroom
-                setSpriteRect(sf::IntRect(8*10, 8*2, 8, 8));
-            } else if (mHealth > 0 and mHealth <= (MAXHEALTH * 0.25)) { // If > 0 and < 25%
-                // Broken Mushroom
-                setSpriteRect(sf::IntRect(8*11, 8*2, 8, 8));
-            }
+    case normal:
+        if (mHealth > (MAXHEALTH * 0.75)) { // If > 75%
+            // Full Mushroom
+            setSpriteRect(sf::IntRect(8 * 8, 8 * 2, 8, 8));
+        } else if (mHealth > (MAXHEALTH * 0.5) and mHealth <= (MAXHEALTH * 0.75)) { // If  > 50% and < 75%
+            // Hit Mushroom
+            setSpriteRect(sf::IntRect(8 * 9, 8 * 2, 8, 8));
+        } else if (mHealth > (MAXHEALTH * 0.25) and mHealth <= (MAXHEALTH * 0.5)) { // If > 25% and < 50%
+            // Damaged Mushroom
+            setSpriteRect(sf::IntRect(8 * 10, 8 * 2, 8, 8));
+        } else if (mHealth > 0 and mHealth <= (MAXHEALTH * 0.25)) { // If > 0 and < 25%
+            // Broken Mushroom
+            setSpriteRect(sf::IntRect(8 * 11, 8 * 2, 8, 8));
+        }
 
-            break;
+        break;
 
-        case super:
-            if (mHealth > (MAXHEALTH * 0.75)) { // If > 75%
-                // Full Mushroom
-                setSpriteRect(sf::IntRect(8*8, 8*3, 8, 8));
-            } else if (mHealth > (MAXHEALTH * 0.5) and mHealth < (MAXHEALTH * 0.75)) { // If > 50% and < 75%
-                // Hit Mushroom
-                setSpriteRect(sf::IntRect(8*9, 8*3, 8, 8));
-            } else if (mHealth > (MAXHEALTH * 0.25) and mHealth < (MAXHEALTH * 0.5)) { // If > 25% and < 50%
-                // Damaged Mushroom
-                setSpriteRect(sf::IntRect(8*10, 8*3, 8, 8));
-            } else if (mHealth > 0 and mHealth < (MAXHEALTH * 0.25)) { // If > 0 and < 25%
-                // Broken Mushroom
-                setSpriteRect(sf::IntRect(8*11, 8*3, 8, 8));
-            }
+    case super:
+        if (mHealth > (MAXHEALTH * 0.75)) { // If > 75%
+            // Full Mushroom
+            setSpriteRect(sf::IntRect(8 * 8, 8 * 3, 8, 8));
+        } else if (mHealth > (MAXHEALTH * 0.5) and mHealth < (MAXHEALTH * 0.75)) { // If > 50% and < 75%
+            // Hit Mushroom
+            setSpriteRect(sf::IntRect(8 * 9, 8 * 3, 8, 8));
+        } else if (mHealth > (MAXHEALTH * 0.25) and mHealth < (MAXHEALTH * 0.5)) { // If > 25% and < 50%
+            // Damaged Mushroom
+            setSpriteRect(sf::IntRect(8 * 10, 8 * 3, 8, 8));
+        } else if (mHealth > 0 and mHealth < (MAXHEALTH * 0.25)) { // If > 0 and < 25%
+            // Broken Mushroom
+            setSpriteRect(sf::IntRect(8 * 11, 8 * 3, 8, 8));
+        }
 
-            break;
+        break;
     }
 }
 
-
 /**
- * @brief 
- * 
- * @param e 
- * @param window 
+ * @brief
+ *
+ * @param e
+ * @param window
  */
 void Mushroom::update() {
     updateTexture();
 }
 
 /**
- * @brief 
+ * @brief tells me if you died
  * 
- * @param target 
- * @param states 
+ * @return true 
+ * @return false 
  */
-void Mushroom::draw(sf::RenderTarget& target,sf::RenderStates states) const {
-    target.draw(mSprite, states);
+bool Mushroom::isDestroyed() const
+{
+    return mHealth <= 0;
 }
-

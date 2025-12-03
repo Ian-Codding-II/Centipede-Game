@@ -1,11 +1,10 @@
 bob 10
 bob 9
+s 9
 jhon 8
-jerry 7
-zzzz 0
-LLL 3000
-john 300
-bob 200
-jane 90
-frank 40
-
+` 0
+`ss 0
+safsdkjhf 0
+`rt 0
+`fd 0
+`fe 0

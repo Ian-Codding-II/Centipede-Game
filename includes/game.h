@@ -1,45 +1,55 @@
 /**
  * @file game.h
  * @author Ian Codding II
- * @brief Decleration of Game class - main gameplay logic
- * @version 0.1
- * @date 2025-10-21
- *
+ * @brief Header for Game class - main game controller
+ * @version 3.2 - Complete integration
+ * @date 2025-12-03
  * @copyright Copyright (c) 2025
- *
  */
 
-#pragma once
+#ifndef GAME_H
+#define GAME_H
 
-#include "bullet.h"
-#include "Centipede_Segment.h"
-#include "Collision_Manager.h"
-#include "Game_State.h"
-#include "player.h"
-#include "ScreenManager.h"
-#include "SettingsScreen.h"
 #include <SFML/Graphics.hpp>
-#include <SFML/Graphics/RectangleShape.hpp>
-#include <SFML/Graphics/Text.hpp>
 #include <vector>
-
-// Forward declarations - these classes exist but we onl need pointers to them
-// This avoids circular includes
-class Player;
-class Centipede;
-class Bullet;
-class Mushroom;
+#include "Game_State.h"
+#include "ScreenManager.h"
+#include "grid.h"
+#include "player.h"
+#include "bullet.h"
+#include "Centipede.h"
+#include "mushroom.h"
+#include "SettingsScreen.h"
+#include "GameOverScreen.h"
+#include "LeaderboardScreen.h"
 
 /**
- * @class Game
- * @brief Main game class that handels all gameplay logic
- *
+ * @brief Main Game class
+ * Orchestrates gameplay: updates player, bullets, mushrooms,
+ * centipede. Handles all collision detection. Manages game state.
  */
 class Game {
+public:
+    Game(sf::RenderWindow& win, ScreenManager& screenMngr);
+    ~Game();
 
-  private:
-    sf::RenderWindow &window;
-    ScreenManager &screenManager;
+    void initialize();
+    void handleInput(const sf::Event& event);
+    void update(float dt);
+    void render();
+
+    GameState getState() const;
+    void setState(GameState newState);
+
+    void cleanup();
+    void setPaused(bool paused);
+    bool getPaused() const;
+    void savePlayerScore(const std::string& playerName);
+    void debugPrint() const;
+
+private:
+    sf::RenderWindow& window;
+    ScreenManager& screenManager;
 
     GameState currentState;
     bool isGameOver;
@@ -49,51 +59,23 @@ class Game {
     int lives;
     int level;
 
-    Player *player;
-    Centipede *centipede;
-    // If we ever make the spider class,
-    // then we would have a pointer to spider
+    sf::RectangleShape* player;
+    Centipede* centipede;
+    std::vector<Mushroom*> mushrooms;
+    Grid* grid;
 
-    std::vector<Bullet *> bullets;
-    std::vector<Mushroom *> mushrooms;
+    sf::RectangleShape background;
+    sf::Text scoreText;
+    sf::Text livesText;
+    sf::Text levelText;
 
-    sf::Text scoreText; // Displays current score
-    sf::Text livesText; // Displays remaining lives
-    sf::Text levelText; // Displays current level
+    sf::Texture texture;
 
-    sf::RectangleShape background; // Black background rectangle
-
-  public:
-    Game(sf::RenderWindow &win, ScreenManager &screenMngr);
-
-    ~Game();
-
-    void initualize();
-
-    void handleInput(const sf::Event &event);
-
-    void update(float dt);
-
-    void render();
-
-    GameState getState() const;
-
-    void cleanup();
-
-    bool checkCollision();
-
-    void addScore();
-
-    bool loseLife();
-
-    void completLevel();
-
-    bool damageCentipedeSegment(int segmentIndex);
-
-    void resetAfterDeath();
+    bool loadTextures();
+    void generateMushrooms();
+    void handleCollisions();
+    void checkGameOver();
+    void updateUI();
 };
-// - Initialize SFML window
-// - Manage game states (Menu, Playing, Paused, GameOver)
-// - Handle state transitions
-// - Coordinate update loop
-// - Render all objects
+
+#endif // GAME_H

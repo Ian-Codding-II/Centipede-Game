@@ -13,40 +13,43 @@
 #ifndef MUSHROOM_H
 #define MUSHROOM_H
 
-#include <SFML/Graphics.hpp>
 #include "collision_object.h"
+#include <SFML/Graphics.hpp>
 
-//int MaxX = 100, MaxY = 100, MinX = 100, MinY = 100;
+// int MaxX = 100, MaxY = 100, MinX = 100, MinY = 100;
 extern const int MAXHEALTH;
 
-enum state {normal, super, destroy};
+enum state { normal,
+             super,
+             destroy };
 
-class Mushroom : public c_obj{
-    //Texture
-    //Sprite
-    //Position
-    //Health
-    //Draw
-public:
-
-    Mushroom(sf::Texture& texture, sf::IntRect spriteTexture = sf::IntRect(0, 0, 8, 8), sf::Vector2i pos = sf::Vector2i(0, 0), int hp = MAXHEALTH, bool isSuper = false);
+class Mushroom : public c_obj {
+    // Texture
+    // Sprite
+    // Position
+    // Health
+    // Draw
+  public:
+    Mushroom(sf::Texture &texture, sf::IntRect spriteTexture = sf::IntRect(0, 0, 8, 8), sf::Vector2f pos = sf::Vector2f(0, 0), int hp = MAXHEALTH, bool isSuper = false);
 
     // Default destructor;
     ~Mushroom() {};
-
+    sf::FloatRect getBounds() const {
+        return mSprite.getGlobalBounds();
+    }
     void hit(float dmg);
     void hit(int dmg);
-
+    bool isDestroyed() const;
     void update();
-    virtual void draw(sf::RenderTarget& target,sf::RenderStates states) const;
-
-private:
+    bool isAlive() const { return alive; }
+    void kill() { alive = false; }
+  private:
     void updateTexture();
     // void updateLvl();
+    bool alive;
 
     sf::Uint32 mShroomState;
     int mHealth; // When hp == 0, destroy
-    
 };
 
 #endif

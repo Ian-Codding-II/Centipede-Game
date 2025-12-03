@@ -62,7 +62,7 @@ MainMenuScreen::MainMenuScreen(sf::RenderWindow& win, sf::Font& fnt)
     // Center the title horizontally and position it near the top
     titleText.setPosition(
         (1200 - titleText.getLocalBounds().width) / 2,
-        60
+        25
     );
 }
 
@@ -110,10 +110,10 @@ void MainMenuScreen::initialize() {
     float winHeight = 800;
     
     // Proportional button sizing
-    float buttonWidth = winWidth * 0.25f;      // 25% of window width
+    float buttonWidth = winWidth * 0.36f;      // 36% of window width
     float buttonHeight = winHeight * 0.09f;    // 9% of window height
     float spacing = winHeight * 0.07f;         // 7% vertical spacing
-    float centerX = (winWidth - buttonWidth) / 2-200;
+    float centerX = (winWidth - buttonWidth) / 2-148;
     
     // Calculate the starting Y position (center buttons vertically)
     float totalHeight = (buttonHeight + spacing) * 4; // 4 buttons
@@ -371,7 +371,7 @@ void MainMenuScreen::renderQuitDialog() {
     sf::Text questionText;
     questionText.setFont(font);
     questionText.setString("\n   Are you sure\nyou want to quit?");
-    questionText.setCharacterSize(30);
+    questionText.setCharacterSize(27);
     questionText.setFillColor(sf::Color::White);
     questionText.setPosition(
        dialogX + (dialogWidth - questionText.getLocalBounds().width) / 2,
