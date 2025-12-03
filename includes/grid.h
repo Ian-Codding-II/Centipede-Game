@@ -17,6 +17,7 @@ public:
     Grid(sf::FloatRect Region, int cellSize);
 
     sf::Vector2f GetPosition(sf::Vector2f position);
+    sf::FloatRect GetRegion() {return mRegion;};
 private:
     sf::FloatRect mRegion;
     int mCellSize;

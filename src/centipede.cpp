@@ -64,7 +64,7 @@ void centipede::setScale(sf::Vector2i factor) {
  * 
  * @param position Position to move to
  */
-void centipede::move(float dt) {
+void centipede::move(float dt, Grid grid) {
     elapsedTime += dt;
 
     if (elapsedTime >= speed) {
@@ -81,15 +81,29 @@ void centipede::move(float dt) {
             lookDir = 16;
         }
 
-        std::vector<c_obj*> collisions = mCentipedeVect[0]->mSprite->getCollided(sf::FloatRect(hPos.x + lookDir, hPos.y, hSize.x / 4, hSize.y));
-        for (long unsigned int i = 0; i < collisions.size(); i++) {
-            if (collisions[i]->getName() == "Mushroom") {
-                bumped = true;
-                break;
+        // Checks collisions and grid bounds
+        sf::FloatRect frontHitbox = sf::FloatRect(hPos.x + lookDir, hPos.y, hSize.x / 4, hSize.y);
+        std::vector<c_obj*> collisions = mCentipedeVect[0]->mSprite->getCollided(frontHitbox);
+        if (collisions.size() > 0) {
+            for (long unsigned int i = 0; i < collisions.size(); i++) {
+                if (collisions[i]->getName() == "Mushroom") {
+                    bumped = true;
+                    break;
+                }
             }
+        } else if (!frontHitbox.intersects(grid.GetRegion())) {
+            bumped = true;
+        }
+
+        // Checks vertical limits
+        if (hPos.y < ((grid.GetRegion().top) - (grid.GetRegion().height / 2))) {
+            vertState = VertDirection::down;
+        } else if (hPos.y > ((grid.GetRegion().top) + (grid.GetRegion().height / 2))) {
+            vertState = VertDirection::up;
         }
 
         if (bumped) {
+            
             if (vertState == VertDirection::down) {
                 sf::Vector2f prevPos = sf::Vector2f(mCentipedeVect[0]->mSprite->getPosition().x, mCentipedeVect[0]->mSprite->getPosition().y);
                 mCentipedeVect[0]->mSprite->setPosition(sf::Vector2f(mCentipedeVect[0]->mSprite->getPosition().x, mCentipedeVect[0]->mSprite->getPosition().y + 16));
@@ -99,28 +113,23 @@ void centipede::move(float dt) {
                     mCentipedeVect[i]->mSprite->setPosition(prevPos);
                     prevPos = currentPos;
                 }
-
-                if (horiState == HoriDirection::left) {
-                    horiState = HoriDirection::right;
-                } else {
-                    horiState = HoriDirection::left;
-                }
             
             } else if (vertState == VertDirection::up) {
                 sf::Vector2f prevPos = sf::Vector2f(mCentipedeVect[0]->mSprite->getPosition().x, mCentipedeVect[0]->mSprite->getPosition().y);
                 mCentipedeVect[0]->mSprite->setPosition(sf::Vector2f(mCentipedeVect[0]->mSprite->getPosition().x, mCentipedeVect[0]->mSprite->getPosition().y - 16));
 
                 for (int i = 1; i < mLength; i++) {
-                    sf::Vector2f currentPos = sf::Vector2f(mCentipedeVect[i]->mSprite->getPosition().x - mSpacing, mCentipedeVect[i]->mSprite->getPosition().y);
+                    sf::Vector2f currentPos = sf::Vector2f(mCentipedeVect[i]->mSprite->getPosition().x, mCentipedeVect[i]->mSprite->getPosition().y);
                     mCentipedeVect[i]->mSprite->setPosition(prevPos);
                     prevPos = currentPos;
                 }
 
-                if (horiState == HoriDirection::left) {
-                    horiState = HoriDirection::right;
-                } else {
-                    horiState = HoriDirection::left;
-                }
+            }
+
+            if (horiState == HoriDirection::left) {
+                horiState = HoriDirection::right;
+            } else {
+                horiState = HoriDirection::left;
             }
         } else {
             if (horiState == HoriDirection::right) {

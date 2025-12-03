@@ -13,6 +13,7 @@
 #define CENTIPEDE_H
 
 #include "animated_object.h"
+#include "grid.h"
 #include <vector>
 #include <cmath>
 
@@ -30,7 +31,7 @@ public:
     void setPosition(sf::Vector2f position);
 
     void setScale(sf::Vector2i factor);
-    void move(float dt);
+    void move(float dt, Grid grid);
     void fall();
 
     void update(float dt);
