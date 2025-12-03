@@ -126,6 +126,9 @@ private:
     Bullet bulletObj;                   ///< Bullet object (handles all bullets)
     std::vector<Mushroom*> mushrooms;   ///< All mushroom obstacles (Balin's class)
     GameGrid* grid;                     ///< Grid system for mushroom positions
+    //std::vector<Bullet> bullets;
+    std::vector<Bullet*> bullets;
+
 
     // ===== GAME STATS =====
     int score;                          ///< Current score

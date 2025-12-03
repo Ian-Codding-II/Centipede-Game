@@ -338,6 +338,7 @@ int main() {
                  * IMPORTANT: Pass dt to ensure frame-independent movement!
                  * Without dt, movement would be frame-dependent and vary with FPS.
                  */
+                
                 if (game != nullptr) {
                     game->update(dt);
 

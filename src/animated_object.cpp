@@ -1,34 +1,34 @@
-/**
- * @file    animated_object.cpp
- * @author  Balin Becker
- * @brief   Animated Object class definition
- * @date    2025-11-24
- */
+    /**
+     * @file    animated_object.cpp
+     * @author  Balin Becker
+     * @brief   Animated Object class definition
+     * @date    2025-11-24
+     */
 
-#include "../includes/animated_object.h"
+    #include "../includes/animated_object.h"
 
-anim_obj::anim_obj(sf::Texture& texture, sf::IntRect StartFrame, int frames) : c_obj(texture, StartFrame, sf::Vector2i(0, 0)) {
-    mSize = StartFrame.getSize();
-    mPos = StartFrame.getPosition();
-    mFrames = frames;
+    anim_obj::anim_obj(sf::Texture& texture, sf::IntRect StartFrame, int frames) : c_obj(texture, StartFrame, sf::Vector2i(0, 0)) {
+        //mSize = StartFrame.getSize();
+        //mPos = StartFrame.getPosition();
+        mFrames = frames;
 
-}
-
-/**
- * @brief update sprite
- *          On function call, change to next frame
- */
-void anim_obj::update(float deltaTime) {
-    totalElapsed += deltaTime;
-
-    if (totalElapsed >= fps) {
-        totalElapsed -= fps;
-        frameCount++;
-        if (frameCount >= mFrames) {
-            frameCount = 0;
-        }
-
-        setSpriteRect(sf::IntRect(mSize.x * frameCount, mSize.y, mSize.x, mSize.y));
     }
-}
+
+    /**
+     * @brief update sprite
+     *          On function call, change to next frame
+     */
+    void anim_obj::update(float deltaTime) {
+        totalElapsed += deltaTime;
+
+        if (totalElapsed >= fps) {
+            totalElapsed -= fps;
+            frameCount++;
+            if (frameCount >= mFrames) {
+                frameCount = 0;
+            }
+
+            setSpriteRect(sf::IntRect(mSize.x * frameCount, mSize.y, mSize.x, mSize.y));
+        }
+    }
 

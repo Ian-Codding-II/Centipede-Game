@@ -26,12 +26,19 @@
  */
 class c_obj : public sf::Drawable {
     public:
+        sf::Texture* mTexture;
+        sf::Sprite mSprite;
+
+        c_obj()
+        {
+            
+        }
         c_obj(sf::Texture& texture):c_obj(texture, sf::IntRect(0, 0, 0, 0), sf::Vector2i(0, 0)) {}
         c_obj(sf::Texture& texture, sf::IntRect spriteTexture, sf::Vector2i pos);
 
         std::vector<c_obj*> getCollided();
 
-        void setPosition(sf::Vector2i pos);
+        void setPosition(sf::Vector2f pos);
         void setSpriteRect(sf::IntRect spriteTexture);
         void setScale(sf::Vector2i factor);
 
@@ -41,8 +48,6 @@ class c_obj : public sf::Drawable {
         virtual void draw(sf::RenderTarget& target,sf::RenderStates states) const;
 
     protected:
-        sf::Sprite mSprite;
-        sf::Texture* mTexture;
         sf::Vector2i mPosition;
 
     private:
