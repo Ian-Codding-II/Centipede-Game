@@ -1,17 +1,17 @@
-    /**
-     * @file    animated_object.cpp
-     * @author  Balin Becker
-     * @brief   Animated Object class definition
-     * @date    2025-11-24
-     */
+/**
+ * @file    animated_object.cpp
+ * @author  Balin Becker
+ * @brief   Animated Object class definition
+ * @date    2025-11-24
+ */
 
-    #include "../includes/animated_object.h"
+#include "../includes/animated_object.h"
 
-anim_obj::anim_obj(sf::Texture& texture, sf::IntRect StartFrame, int frames, std::string name) : c_obj(texture, StartFrame, sf::Vector2f(0, 0), name) 
-{
-    mSize = sf::Vector2f(static_cast<float>(StartFrame.width), static_cast<float>(StartFrame.height));
-    mPos  = sf::Vector2f(static_cast<float>(StartFrame.left),  static_cast<float>(StartFrame.top));
+anim_obj::anim_obj(sf::Texture& texture, sf::IntRect StartFrame, int frames, std::string name) : c_obj(texture, StartFrame, sf::Vector2f(0, 0), name) {
+    mSize = sf::Vector2f(StartFrame.getSize().x, StartFrame.getSize().y);
+    mPos = sf::Vector2f(StartFrame.getPosition().x, StartFrame.getPosition().y);
     mFrames = frames;
+
 }
 
 /**
@@ -31,3 +31,4 @@ void anim_obj::update(float deltaTime) {
         setSpriteRect(sf::IntRect(mSize.x * frameCount, mPos.y, mSize.x, mSize.y));
     }
 }
+
