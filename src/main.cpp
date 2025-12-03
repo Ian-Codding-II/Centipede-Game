@@ -47,7 +47,7 @@ int main() {
         newMushroom.setScale(sf::Vector2i(2, 2));
         newMushroom.update();
 
-        newMushroom2.setPosition(grid.GetPosition(sf::Vector2f(300, 100)));
+        newMushroom2.setPosition(grid.GetPosition(sf::Vector2f(210, 1)));
         newMushroom2.setScale(sf::Vector2i(2, 2));
         newMushroom2.update();
         

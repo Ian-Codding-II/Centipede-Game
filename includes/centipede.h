@@ -16,6 +16,9 @@
 #include <vector>
 #include <cmath>
 
+enum HoriDirection {left, right};
+enum VertDirection {up, down};
+
 class centipede {
 public:
     centipede(sf::Texture& Texture) : centipede(Texture, 8, sf::Vector2f(0, 0), sf::Vector2i(1, 1)) {};
@@ -42,6 +45,7 @@ private:
 
     std::vector<segment> mCentipedeVect;
     sf::Vector2f mPosition;
+    
     int mSpacing;
     
 };
