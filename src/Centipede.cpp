@@ -50,7 +50,11 @@ Centipede::~Centipede() {
 }
 
 /**
+<<<<<<< HEAD
+ * @brief Hits the centipede at the located part
+=======
  * @brief Hits the Centipede at the located part
+>>>>>>> 3df56bc79f854491f76b2bf4c343b94d0134d8bd
  * 
  * @param part 
  */
@@ -75,7 +79,9 @@ void Centipede::hit(const c_obj* part) {
 
 
 /**
- * @brief Places all Centipede segments at position
+ * @brief Places all centipede segments at position
+=======
+ 
  * 
  * @param position Position to place at
  */
@@ -96,6 +102,18 @@ void Centipede::setScale(sf::Vector2i factor) {
     }
 }
 
+void Centipede::hit() {
+    if (!mCentipedeVect.empty()) {
+        segment* tail = mCentipedeVect.back();
+        delete tail->mSprite;
+        delete tail;
+        mCentipedeVect.pop_back();
+        mLength = static_cast<int>(mCentipedeVect.size()); // update length!
+    }
+}
+
+
+
 /**
  * @brief Moves the Centipede to the position
  * 
@@ -108,8 +126,9 @@ void Centipede::move(float dt, Grid grid) {
         elapsedTime -= speed;
 
         bool bumped = false;
-        sf::Vector2f hPos = mCentipedeVect[0]->mSprite->getSprite().getGlobalBounds().getPosition();
-        sf::Vector2f hSize = mCentipedeVect[0]->mSprite->getSprite().getGlobalBounds().getSize();
+        sf::FloatRect bounds = mCentipedeVect[0]->mSprite->getSprite().getGlobalBounds();
+        sf::Vector2f hPos(bounds.left, bounds.top);
+        sf::Vector2f hSize(bounds.width, bounds.height);
 
         int lookDir = 0;
         if (horiState == HoriDirection::left) {

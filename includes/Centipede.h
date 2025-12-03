@@ -22,6 +22,7 @@ enum class VertDirection {up, down};
 
 class Centipede: public sf::Drawable {
 public:
+    //sf::Texture* mTexture;
     Centipede(sf::Texture& Texture) : Centipede(Texture, 8, sf::Vector2f(0, 0), sf::Vector2i(1, 1)) {};
     Centipede(sf::Texture& Texture, int length, sf::Vector2f position, sf::Vector2i factor);
 
@@ -36,7 +37,7 @@ public:
     void move(float dt, Grid grid);
     void fall();
     void hit(const c_obj* part);
-
+    void hit(); // Simple hit
     void update(float dt);
     void draw(sf::RenderTarget& target,sf::RenderStates states) const;
 
