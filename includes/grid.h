@@ -1,6 +1,6 @@
 /**
  * @file    grid.h
- * @author  Balin Becker Ian Codding II Roman Salazar
+ * @author  Balin Becker
  * @brief   Grid Class
  * @date    2025-12-01
  */
@@ -17,8 +17,7 @@ public:
     Grid(sf::FloatRect Region, int cellSize);
 
     sf::Vector2f GetPosition(sf::Vector2f position);
-
-    sf::FloatRect getRegion() const { return mRegion;}
+    sf::FloatRect GetRegion() {return mRegion;};
 private:
     sf::FloatRect mRegion;
     int mCellSize;

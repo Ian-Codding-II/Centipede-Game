@@ -1,6 +1,6 @@
 /**
  * @file    grid.cpp
- * @author  Balin Becker Ian Codding II Roman Salazar
+ * @author  Balin Becker
  * @brief   Grid Class Definitions
  * @date    2025-12-01
  */

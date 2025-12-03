@@ -1,10 +1,9 @@
 /**
  * @file game.h
  * @author Ian Codding II
- * @brief Header for Game class - integrated with existing classes
- * @version 2.0 - Compatible with Balin's and Roman's code
- * @date 2025-11-26
- *
+ * @brief Header for Game class - main game controller
+ * @version 3.2 - Complete integration
+ * @date 2025-12-03
  * @copyright Copyright (c) 2025
  */
 
@@ -26,8 +25,8 @@
 
 /**
  * @brief Main Game class
- * Orchestrates gameplay: player, bullets, mushrooms, centipede
- * Objects handle their own collision and grid management
+ * Orchestrates gameplay: updates player, bullets, mushrooms,
+ * centipede. Handles all collision detection. Manages game state.
  */
 class Game {
 public:
@@ -43,13 +42,10 @@ public:
     void setState(GameState newState);
 
     void cleanup();
-    void debugPrint() const;
-    
-    /**
-     * @brief Save player name and score to leaderboard
-     * @param playerName Name entered by player
-     */
+    void setPaused(bool paused);
+    bool getPaused() const;
     void savePlayerScore(const std::string& playerName);
+    void debugPrint() const;
 
 private:
     sf::RenderWindow& window;
@@ -59,15 +55,14 @@ private:
     bool isGameOver;
     bool isPaused;
 
-    sf::RectangleShape* player;
-    Centipede* centipede;
-    Bullet bulletObj;
-    std::vector<Mushroom*> mushrooms;
-    Grid* grid;
-
     int score;
     int lives;
     int level;
+
+    sf::RectangleShape* player;
+    Centipede* centipede;
+    std::vector<Mushroom*> mushrooms;
+    Grid* grid;
 
     sf::RectangleShape background;
     sf::Text scoreText;
@@ -78,6 +73,7 @@ private:
 
     bool loadTextures();
     void generateMushrooms();
+    void handleCollisions();
     void checkGameOver();
     void updateUI();
 };

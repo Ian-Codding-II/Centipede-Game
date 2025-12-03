@@ -12,7 +12,7 @@
 
 class anim_obj : public c_obj {
 public:
-    anim_obj(sf::Texture& texture, sf::IntRect StartFrame, int frames);
+    anim_obj(sf::Texture& texture, sf::IntRect StartFrame, int frames, std::string name);
     void update(float deltaTime);
 private:
     sf::Vector2f mPos;

@@ -2,7 +2,7 @@
  * @file main.cpp
  * @author Ian Codding II
  * @brief Entry point for Centipede game - sets up window and main loop
- * @version 2.0
+ * @version 2.1 - Fixed pause/resume state management
  * @date 2025-10-27
  *
  * @copyright Copyright (c) 2025
@@ -271,27 +271,78 @@ int main() {
                      * - User can Resume, go to Main Menu, or Quit
                      * - ScreenManager (PauseScreen) handles these buttons
                      * - Game object is NOT updated while paused
+                     * - PauseScreen returns next state which we check after this loop
                      */
                     screenManager.update(event);
+                    {
+                        // Check what state the ScreenManager transitioned to after pause screen input
+                        GameState newScreenState = screenManager.getState();
+                        
+                        // If pause screen changed state to PLAYING (resume clicked)
+                        if (newScreenState == GameState::PLAYING && game != nullptr) {
+                            std::cout << "[main] Resume clicked - resuming game" << std::endl;
+                            game->setPaused(false);
+                        }
+                        // If pause screen changed state to MENU (main menu clicked)
+                        else if (newScreenState == GameState::MENU && game != nullptr) {
+                            std::cout << "[main] Main Menu clicked from pause - cleaning up game" << std::endl;
+                            game->cleanup();
+                            delete game;
+                            game = nullptr;
+                        }
+                    }
                     break;
 
                 case GameState::GAME_OVER:
                     /**
                      * Game over state
+                     * - User can enter name if top 10 score
                      * - User can Play Again or return to Main Menu
                      * - ScreenManager (GameOverScreen) handles these buttons
                      */
                     screenManager.update(event);
+                    {
+                        // Check what state the ScreenManager transitioned to after game over screen input
+                        GameState newScreenState = screenManager.getState();
+                        
+                        // If game over screen changed state to PLAYING (play again clicked)
+                        if (newScreenState == GameState::PLAYING && game != nullptr) {
+                            std::cout << "[main] Play Again clicked - resetting game" << std::endl;
+                            game->cleanup();
+                            delete game;
+                            game = nullptr;
+                            
+                            // Reset game over screen for next time
+                            GameOverScreen *gameOverScreen =
+                                (GameOverScreen *)screenManager.getScreen(GameState::GAME_OVER);
+                            if (gameOverScreen != nullptr) {
+                                gameOverScreen->reset();
+                            }
+                        }
+                        // If game over screen changed state to MENU (main menu clicked)
+                        else if (newScreenState == GameState::MENU && game != nullptr) {
+                            std::cout << "[main] Main Menu clicked from game over - cleaning up game" << std::endl;
+                            game->cleanup();
+                            delete game;
+                            game = nullptr;
+                            
+                            // Reset game over screen for next time
+                            GameOverScreen *gameOverScreen =
+                                (GameOverScreen *)screenManager.getScreen(GameState::GAME_OVER);
+                            if (gameOverScreen != nullptr) {
+                                gameOverScreen->reset();
+                            }
+                        }
+                    }
                     break;
 
                     // ===== GAMEPLAY STATE =====
 
                 case GameState::PLAYING:
                     /**
-                     * Active gameplay state\
-                     *
+                     * Active gameplay state
                      * - Player can move and shoot
-                     * - Press ESC to pause
+                     * - Press P or ESC to pause
                      * - Game class (not ScreenManager) handles all events
                      */
                     if (game == nullptr) {
@@ -354,8 +405,8 @@ int main() {
 
             } else {
                 /**
-                 * UI update
-                 * ScreenManager doesn't need per-frame updates
+                 * Other UI states update
+                 * ScreenManager doesn't need per-frame updates for most screens
                  * (It handles everything in event processing)
                  *
                  * Note: We could add animations here if needed

@@ -110,7 +110,7 @@ void MainMenuScreen::initialize() {
     float winHeight = 800;
     
     // Proportional button sizing
-    float buttonWidth = winWidth * 0.36f;      // 25% of window width
+    float buttonWidth = winWidth * 0.36f;      // 36% of window width
     float buttonHeight = winHeight * 0.09f;    // 9% of window height
     float spacing = winHeight * 0.07f;         // 7% vertical spacing
     float centerX = (winWidth - buttonWidth) / 2-148;
