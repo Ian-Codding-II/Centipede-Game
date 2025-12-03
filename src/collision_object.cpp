@@ -71,23 +71,6 @@ std::vector<c_obj*> c_obj::getCollided(sf::FloatRect region) {
 }
 
 /**
- * @brief Get collided objects within region
- * @param region Region to check collisions in
- * @return Vector of colliding c_obj pointers
- */
-std::vector<c_obj*> c_obj::getCollided(sf::FloatRect region) {
-    std::vector<c_obj*> collisions;
-    for (c_obj* obj: objects) {
-        sf::FloatRect compareRegion = obj->mSprite.getGlobalBounds();
-        if (region.intersects(compareRegion)) {
-            collisions.push_back(obj);
-        }
-    }
-
-    return collisions;
-}
-
-/**
  * @brief Sets sprite position
  * @param pos Position to set
  */

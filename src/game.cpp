@@ -152,16 +152,16 @@ void Game::update(float dt) {
         }
     }
     //std::cout << " NOW!!!!" << '\n';
-    for (int i = (int)bulletObj.bullets.size() - 1; i >= 0; i--) {
-        Bullet* bullet = bulletObj.bullets[i];
+for (int i = (int)Bullet::bullets.size() - 1; i >= 0; i--) {
+        Bullet* bullet = Bullet::bullets[i];
         bullet->update(dt);
         if (!(bullet->isAlive())) {
-            sf::Vector2i intPos = bullet->getPosition();
-        sf::Vector2f floatPos(static_cast<float>(intPos.x), static_cast<float>(intPos.y));  // safe access
-            std::cout << "The x value for the bullet = " << floatPos.x
-                << " and the y value for the bullet = " << floatPos.y << '\n';
+        sf::Vector2f pos = bullet->getPosition();       // position as float
+        sf::Vector2i intPos(static_cast<int>(pos.x), static_cast<int>(pos.y)); // convert to int
+            std::cout << "The x value for the bullet = " << intPos.x
+                << " and the y value for the bullet = " << intPos.y << '\n';
         delete bullet;
-        bulletObj.bullets.erase(bulletObj.bullets.begin() + i);
+        Bullet::bullets.erase(Bullet::bullets.begin() + i);
         std::cout << "[Game] Bullet removed (off-screen)" << std::endl;
                         }
     }
@@ -271,7 +271,7 @@ void Game::render() {
     {
         if (bullet )
         {
-            window.draw(bullet->mSprite);
+            window.draw(bullet->getSprite());
         }
     }
 
@@ -439,10 +439,7 @@ void Game::checkGameOver() {
             }
         }
 
-        if (!b->isAlive()) {
-            delete b;
-            Bullet::bullets.erase(Bullet::bullets.begin() + i);
-        }
+        
     }
 }
 

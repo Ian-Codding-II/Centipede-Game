@@ -7,11 +7,11 @@
 
     #include "../includes/animated_object.h"
 
-anim_obj::anim_obj(sf::Texture& texture, sf::IntRect StartFrame, int frames, std::string name) : c_obj(texture, StartFrame, sf::Vector2f(0, 0), name) {
-    mSize = sf::Vector2f(StartFrame.getSize().x, StartFrame.getSize().y);
-    mPos = sf::Vector2f(StartFrame.getPosition().x, StartFrame.getPosition().y);
+anim_obj::anim_obj(sf::Texture& texture, sf::IntRect StartFrame, int frames, std::string name) : c_obj(texture, StartFrame, sf::Vector2f(0, 0), name) 
+{
+    mSize = sf::Vector2f(static_cast<float>(StartFrame.width), static_cast<float>(StartFrame.height));
+    mPos  = sf::Vector2f(static_cast<float>(StartFrame.left),  static_cast<float>(StartFrame.top));
     mFrames = frames;
-
 }
 
 /**

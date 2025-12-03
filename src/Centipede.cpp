@@ -82,8 +82,10 @@ void Centipede::move(float dt, Grid grid) {
         elapsedTime -= speed;
 
         bool bumped = false;
-        sf::Vector2f hPos = mCentipedeVect[0]->mSprite->getSprite().getGlobalBounds().getPosition();
-        sf::Vector2f hSize = mCentipedeVect[0]->mSprite->getSprite().getGlobalBounds().getSize();
+        sf::FloatRect hRect = mCentipedeVect[0]->mSprite->getSprite().getGlobalBounds();
+        sf::Vector2f hPos(hRect.left, hRect.top);
+        sf::Vector2f hSize(hRect.width, hRect.height);
+
 
         int lookDir = 0;
         if (horiState == HoriDirection::left) {
