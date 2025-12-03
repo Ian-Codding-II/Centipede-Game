@@ -36,7 +36,6 @@ public:
     void setScale(sf::Vector2i factor);
     void move(float dt, Grid grid);
     void fall();
-    void hit(const c_obj* part);
     void hit(); // Simple hit
     void update(float dt);
     void draw(sf::RenderTarget& target,sf::RenderStates states) const;

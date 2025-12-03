@@ -50,35 +50,6 @@ Centipede::~Centipede() {
 }
 
 /**
-<<<<<<< HEAD
- * @brief Hits the centipede at the located part
-=======
- * @brief Hits the Centipede at the located part
->>>>>>> 3df56bc79f854491f76b2bf4c343b94d0134d8bd
- * 
- * @param part 
- */
-void Centipede::hit(const c_obj* part) {
-    int targetIndex = 0;
-    for (int i = 0; i < mLength; i++) {
-        if (mCentipedeVect[i]->mSprite == part) {
-            targetIndex = i;
-        }
-    }
-    if (targetIndex == 0) { // Head
-        mCentipedeVect.erase(mCentipedeVect.begin());
-        mCentipedeVect.shrink_to_fit();
-    } else if (targetIndex == mLength - 1) { // End / Tail
-        mCentipedeVect.pop_back();
-    } else {
-        Centipede* leftCenti = new Centipede(mTexture, targetIndex, mCentipedeVect[0]->mSprite->getPosition(), sf::Vector2i(2, 2));
-        Centipede* rightCenti = new Centipede(mTexture, mLength - (targetIndex + 1), mCentipedeVect[mLength - (targetIndex + 1)]->mSprite->getPosition(), sf::Vector2i(2, 2));
-        this->~Centipede();
-    }
-}
-
-
-/**
  * @brief Places all centipede segments at position
 =======
  
@@ -104,15 +75,12 @@ void Centipede::setScale(sf::Vector2i factor) {
 
 void Centipede::hit() {
     if (!mCentipedeVect.empty()) {
-        segment* tail = mCentipedeVect.back();
-        delete tail->mSprite;
-        delete tail;
+        delete mCentipedeVect.back()->mSprite;
+        delete mCentipedeVect.back();
         mCentipedeVect.pop_back();
-        mLength = static_cast<int>(mCentipedeVect.size()); // update length!
+        mLength--; // update length!
     }
 }
-
-
 
 /**
  * @brief Moves the Centipede to the position

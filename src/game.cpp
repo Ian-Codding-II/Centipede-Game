@@ -98,7 +98,7 @@ void Game::initialize() {
     player = new sf::RectangleShape();
     Player::startPlayer(*player, texture);
 
-    //centipede = new Centipede(texture, 5, sf::Vector2f(200, 100), sf::Vector2i(2, 2));
+    centipede = new Centipede(texture, 5, sf::Vector2f(200, 100), sf::Vector2i(2, 2));
     //std::cout << "[Game] Centipede created" << std::endl;
 
     generateMushrooms();
