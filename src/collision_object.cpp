@@ -37,7 +37,7 @@ c_obj::c_obj(sf::Texture& texture, sf::IntRect spriteTexture, sf::Vector2f pos, 
 }
 
 c_obj::~c_obj() {
-    for (int i = 0; i < objects.size(); i++) {
+    for (long unsigned int i = 0; i < objects.size(); i++) {
         if (objects[i] == this) {
             delete objects[i];
             objects.erase(objects.begin() + i);
@@ -80,25 +80,6 @@ std::vector<c_obj*> c_obj::getCollided(sf::FloatRect region) {
 
     return collisions;
 }
-
-/**
- * @brief Get the Collided objects within the given region
- * 
- * @param region 
- * @return std::vector<c_obj*> 
- */
-std::vector<c_obj*> c_obj::getCollided(sf::FloatRect region) {
-    std::vector<c_obj*> collisions;
-    for (c_obj* obj: objects) {
-        sf::FloatRect compareRegion = obj->mSprite.getGlobalBounds();
-        if (region.intersects(compareRegion)) {
-            collisions.push_back(obj);
-        }
-    }
-
-    return collisions;
-}
-
 
 /**
  * @brief Sets sprite position

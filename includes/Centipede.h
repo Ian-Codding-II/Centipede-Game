@@ -1,7 +1,7 @@
 /**
- * @file    centipede.h
+ * @file    Centipede.h
  * @author  Ian Codding II, Balin Becker
- * @brief   Create a centipede simulator
+ * @brief   Create a Centipede simulator
  * @date    2025-10-21
  */
 
@@ -26,15 +26,16 @@ public:
     Centipede(sf::Texture& Texture, int length, sf::Vector2f position, sf::Vector2i factor);
 
     ~Centipede();
-
     // Returns head position
     sf::Vector2f getPosition() {return mPosition;};
 
+    
     void setPosition(sf::Vector2f position);
-
+    
     void setScale(sf::Vector2i factor);
     void move(float dt, Grid grid);
     void fall();
+    void hit(const c_obj* part);
 
     void update(float dt);
     void draw(sf::RenderTarget& target,sf::RenderStates states) const;
@@ -56,6 +57,7 @@ private:
     int mSpacing;
     float elapsedTime = 0.0;
     const float speed = 0.1;
+    sf::Texture* mTexture;
     
 };
 
